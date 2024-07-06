@@ -30,7 +30,7 @@ jobs:
         with:
           node-version: '14'
       - name: Change directory
-        run: cd back-end
+        run: cd backend
       - name: Install dependencies
         run: npm install
       - name: Run build
