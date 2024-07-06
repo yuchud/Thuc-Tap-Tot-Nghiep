@@ -29,9 +29,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - name: Change directory
-        run: cd backend
       - name: Install dependencies
+        working-directory: ./backend
         run: npm install
       - name: Run build
+        working-directory: ./backend
         run: npm run build
