@@ -14,8 +14,8 @@ app.use('/accounts', accountRoutes);
 app.use('/decks', deckRoutes);
 app.use('/customers', customerRoutes);
 
-app.listen(appConfig.PORT, () => {
+const server = app.listen(appConfig.PORT, () => {
     console.log(`Server is running on http://localhost:${appConfig.PORT}`);
   });          
 
-module.exports = app; // Export the app object for testing
+module.exports = {app, server}; // Export the app object for testing
