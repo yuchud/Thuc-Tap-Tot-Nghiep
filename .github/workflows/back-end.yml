@@ -32,7 +32,6 @@ jobs:
           echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
           echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
           echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> $GITHUB_ENV
-          echo "DB_DIALECT=${{ secrets.DB_DIALECT }}" >> $GITHUB_ENV
       - name: Run build
         working-directory: ./backend
         run: node app.js
@@ -41,4 +40,3 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DATABASE: ${{ secrets.DB_DATABASE }}
-          DB_DIALECT: ${{ secrets.DB_DIALECT }}
