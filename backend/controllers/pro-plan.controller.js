@@ -1,5 +1,5 @@
-proPlanService = require("../services/ProPlanService");
-const baseController = require("./BaseController");
+const proPlanService = require("../services/pro-plan.service");
+const baseController = require("./base.controller");
 
 const proPlanController = {
   getAllProPlans: async function (req, res) {

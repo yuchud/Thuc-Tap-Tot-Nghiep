@@ -1,8 +1,7 @@
-const mysql = require("mysql2");
 require("dotenv").config();
-const dbConfig = require("./config/dbConfig");
+const dbConfig = require("../config/db.config");
 const Sequelize = require("sequelize");
-// Create a connection pool using your database configuration
+
 const sequelize = new Sequelize(
   dbConfig.database,
   dbConfig.user,
@@ -11,15 +10,15 @@ const sequelize = new Sequelize(
     host: dbConfig.host,
     dialect: dbConfig.dialect,
   }
-); 
+);
 
 const models = {
-  AccountRoleModel: require("./models/AccountRoleModel").init(sequelize),
-  AccountModel: require("./models/AccountModel").init(sequelize),
-  DeckModel: require("./models/DeckModel").init(sequelize),
-  CustomerModel: require("./models/CustomerModel").init(sequelize),
+  AccountRoleModel: require("../models/account-role.model").init(sequelize),
+  AccountModel: require("../models/account.model").init(sequelize),
+  DeckModel: require("../models/deck.model").init(sequelize),
+  CustomerModel: require("../models/customer.model").init(sequelize),
 };
- 
+
 Object.values(models)
   .filter((model) => typeof model.associate === "function")
   .forEach((model) => model.associate(models));
@@ -37,8 +36,4 @@ async function init() {
 
 init();
 
-//const pool = mysql.createPool(dbConfig).promise(); // Using promise() allows you to use async/await for queries
-
-// Export the pool for use in other parts of your application
-// module.exports = pool;
 module.exports = sequelize;

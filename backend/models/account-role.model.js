@@ -16,8 +16,7 @@ class AccountRoleModel extends Sequelize.Model {
             sequelize,
             modelName: 'AccountRole',
             tableName: 'account_roles',
-            createdAt: false,
-            updatedAt: false,
+            timestamps: false,
         });
     }
 }

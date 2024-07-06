@@ -1,4 +1,4 @@
-proPlanRepository = require('../repositories/ProPlanRepository');
+proPlanRepository = require('../repositories/pro-plan.repository');
 const proPlansService = {
   getAllProPlans: async function () {
     return await proPlanRepository.getAllProPlans();

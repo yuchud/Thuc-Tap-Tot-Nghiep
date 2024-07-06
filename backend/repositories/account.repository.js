@@ -1,7 +1,9 @@
-const db = require("../db");
+const db = require("../src/db-connection");
 const jwt = require("jsonwebtoken");
-const AccountModel = require("../models/AccountModel");
-const handleSequelizeError = require("../utils/SequelizeErrorHandler");
+const AccountModel = require("../models/account.model");
+const handleSequelizeError = require("../utils/sequelize-error-handler.util");
+const appConfig = require("../config/app.config");
+const { hashPassword, comparePassword } = require("../utils/hashing.utils");
 
 const accountModel = {
   isAccountDuplicated: async function (usernameOrEmail) {
@@ -37,31 +39,36 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  createAccount: async function (account) {
+  createAccount: async function (accountData) {
     try {
-      const result = await AccountModel.create(account);
-      return result.dataValues.id;
+      const account = await AccountModel.create(accountData);
+      return account.id;
     } catch (e) {
       return handleSequelizeError(e);
     }
   },
   getAccountById: async function (id) {
     try {
-      return await AccountModel.findByPk(id);
+      const account = await AccountModel.findByPk(id);
+      if (!account) {
+        throw new Error("Account not found");
+      }
+      return account;
     } catch (e) {
       return handleSequelizeError(e);
     }
   },
-  isPasswordCorrect: async function (user_password, password) {
-    return (await user_password) === password;
+  isPasswordCorrect: async function (firstPassword, secondPassword) {
+    return await comparePassword(firstPassword, secondPassword);
   },
-  updatePassword: async function (id, password) {
+  updatePassword: async function (id, newPassword) {
     try {
-      const result = await AccountModel.update(
-        { password: password },
+      const hashedPassword = await hashPassword(newPassword);
+      const [updateCount] = await AccountModel.update(
+        { password: hashedPassword },
         { where: { id: id } }
       );
-      return result !== null;
+      return updateCount > 0;
     } catch (e) {
       return handleSequelizeError(e);
     }
@@ -93,16 +100,19 @@ const accountModel = {
   },
   deleteAccount: async function (id) {
     try {
-      const [result] = await db.query("DELETE FROM accounts WHERE id = ?", [
-        id,
-      ]);
-      return result.affectedRows > 0;
+      const result = await AccountModel.destroy({ where: { id: id } });
+      return result > 0;
     } catch (e) {
       return handleSequelizeError(e);
     }
   },
-  getToken: async function (user) {
-    const token = jwt.sign({ id: user.id , role: user.account_role_id}, process.env.JWT_SECRET);
+  getToken: async function (account_id) {
+    const user = await this.getAccountById(account_id);
+    const token = jwt.sign(
+      { id: user.id, role: user.account_role_id },
+      appConfig.JWT_SECRET,
+      { expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s` }
+    );
     return { token: token, message: "Login successfully" };
   },
 };

@@ -11,10 +11,15 @@ class AccountsModel extends Sequelize.Model {
             username: {
                 type: DataTypes.STRING,
                 allowNull: false,
+                unique: true,
             },
             email: {
                 type: DataTypes.STRING,
                 allowNull: true,
+                unique: true,
+                validate: {
+                    isEmail: true,
+                }
             },
             password: {
                 type: DataTypes.STRING,
@@ -29,16 +34,15 @@ class AccountsModel extends Sequelize.Model {
                 type: DataTypes.INTEGER,
                 allowNull: false,
                 references: {
-                    model: 'account_roles',
+                    model: 'AccountRole',
                     key: 'id',
                 },
             },
         }, {
             sequelize,
-            modelName: 'Accounts',
+            modelName: 'Account',
             tableName: 'accounts',
-            createdAt: 'created_at',
-            updatedAt: false,
+            timestamps: false,
         });
     }
 }

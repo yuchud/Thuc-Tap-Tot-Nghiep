@@ -1,8 +1,8 @@
-// backend/services/accountService.js
-const accountRepository = require("../repositories/AccountRepository");
-const customerRepository = require("../repositories/CustomerRepository");
-const ErrorTypes = require("../utils/ErrorTypes");
-const sequelize = require("../db");
+const accountRepository = require("../repositories/account.repository");
+const customerRepository = require("../repositories/customer.repository");
+const ErrorTypes = require("../utils/error-types.util");
+const sequelize = require("../src/db-connection");
+
 const accountService = {
   createAccount: async function (account) {
     const t = await sequelize.transaction();
@@ -28,9 +28,8 @@ const accountService = {
       const account_id = await accountRepository.createAccount(account, {
         transaction: t,
       });
-
       await customerRepository.createCustomer(
-        { account_id: account_id },
+        account_id,
         { transaction: t }
       );
 
@@ -43,11 +42,11 @@ const accountService = {
   },
 
   getAccountById: async function (id) {
-    return await accountRepository.getAccountById(id);
+    return accountRepository.getAccountById(id);
   },
 
-  updatePassword: async function (id, password) {
-    return await accountRepository.updatePassword(id, password);
+  updatePassword: async function (id, newPassword) {
+    return accountRepository.updatePassword(id, newPassword);
   },
 
   login: async function (usernameOrEmail, password) {
@@ -58,15 +57,12 @@ const accountService = {
       return ErrorTypes.Account.NOT_FOUND;
     }
 
-    const isPasswordCorrect = await accountRepository.isPasswordCorrect(
-      user.password,
-      password
-    );
+    const isPasswordCorrect = accountRepository.isPasswordCorrect(password, user.password);
     if (!isPasswordCorrect) {
       return ErrorTypes.Account.WRONG_PASSWORD;
     }
 
-    return accountRepository.getToken(user);
+    return accountRepository.getToken(user.id);
   },
 };
 

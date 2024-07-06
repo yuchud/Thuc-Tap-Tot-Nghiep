@@ -1,5 +1,5 @@
-deckRepository = require("../repositories/DeskRepository");
-const baseController = require("./BaseController");
+const deckRepository = require("../repositories/deck.repository");
+const baseController = require("./base.controller");
 
 const deckController = {
   getAllDecks: async function (req, res) {

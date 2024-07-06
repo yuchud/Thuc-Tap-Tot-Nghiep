@@ -1,6 +1,5 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = process.env;
-
 
 const authenticate = (req, res, next) => {
   if (!req.headers.authorization) {
@@ -8,13 +7,13 @@ const authenticate = (req, res, next) => {
   }
 
   try {
-    //const token = req.headers.authorization.split(' ')[1]; 
-    const token = jwt.sign({ id: 1, role: 2 }, JWT_SECRET);
+    //const token = req.headers.authorization.split(' ')[1];
+    const token = jwt.sign({ id: 1, role: 1 }, JWT_SECRET);
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Authentication failed' });
+    res.status(401).json({ message: "Authentication failed" });
   }
 };
 
