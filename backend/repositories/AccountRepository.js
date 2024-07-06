@@ -2,8 +2,6 @@ const db = require("../db");
 const jwt = require("jsonwebtoken");
 const AccountModel = require("../models/AccountModel");
 const handleSequelizeError = require("../utils/SequelizeErrorHandler");
-const CustomerModel = require("../models/CustomerModel");
-
 
 const accountModel = {
   isAccountDuplicated: async function (usernameOrEmail) {
@@ -16,7 +14,7 @@ const accountModel = {
           ],
         },
       });
-      return rows.length > 0;
+      return account != null;
     } catch (e) {
       return handleSequelizeError(e);
     }

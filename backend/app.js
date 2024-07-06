@@ -17,3 +17,5 @@ app.use('/customers', customerRoutes);
 app.listen(appConfig.PORT, () => {
     console.log(`Server is running on http://localhost:${appConfig.PORT}`);
   });          
+
+module.exports = app; // Export the app object for testing
