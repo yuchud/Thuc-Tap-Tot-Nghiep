@@ -11,7 +11,7 @@ const sequelize = new Sequelize(
     host: dbConfig.host,
     dialect: dbConfig.dialect,
   }
-);
+); 
 
 const models = {
   AccountRoleModel: require("./models/AccountRoleModel").init(sequelize),
