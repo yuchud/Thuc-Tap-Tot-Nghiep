@@ -22,6 +22,11 @@ class DeckModel extends Sequelize.Model {
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        is_public: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,

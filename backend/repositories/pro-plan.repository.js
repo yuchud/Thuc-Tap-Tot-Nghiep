@@ -1,39 +1,49 @@
-const db = require("../db-connection");
+const proPlanModel = require("../models/pro-plan.model");
+const handleSequelizeError = require("../utils/sequelize-error-handler.util");
 
-const proPlansModel = {
-  getAllProPlans: async function () {
+const proPlanRepository = {
+  getAllProPlans: async () => {
     try {
-      const [rows] = await db.query("SELECT * FROM pro_plans");
-      return rows;
+      const proPlans = await proPlanModel.findAll();
+      return proPlans;
     } catch (e) {
-      console.error("proPlansModel.getAllProPlans", e.message);
-      return { error: e.message };
+      return handleSequelizeError(e);
     }
   },
-  getProPlanById: async function (id) {
+  getProPlanById: async (id) => {
     try {
-      const [rows] = await db.query("SELECT * FROM pro_plans WHERE id = ?", [
-        id,
-      ]);
-      return rows[0];
+      const proPlan = await proPlanModel.findByPk(id);
+      return proPlan.id ? proPlan : { error: "Pro Plan not found" };
     } catch (e) {
-      console.error("proPlansModel.getProPlanById", e.message);
-      return { error: e.message };
+      return handleSequelizeError(e);
     }
   },
-    createProPlan: async function (proPlan) {
-        console.log(proPlan)
-        try {
-        const [result] = await db.query(
-            "INSERT INTO pro_plans (name, price, description) VALUES (?, ?, ?)",
-            [proPlan.name, proPlan.price, proPlan.description]
-        );
-        return result.insertId;
-        } catch (e) {
-        console.error("proPlansModel.createProPlan", e.message);
-        return { error: e.message };
-        }
-    },
+  createProPlan: async (proPlanData) => {
+    try {
+      const newProPlan = await proPlanModel.create(proPlanData);
+      return newProPlan.id;
+    } catch (e) {
+      return handleSequelizeError(e);
+    }
+  },
+  deleteProPlan: async (id) => {
+    try {
+      const deletedCount = await proPlanModel.destroy({ where: { id: id } });
+      return deletedCount > 0;
+    } catch (e) {
+      return handleSequelizeError(e);
+    }
+  },
+  updateProPlan: async (id, proPlanData) => {
+    try {
+      const [updatedCount] = await proPlanModel.update(proPlanData, {
+        where: { id: id },
+      });
+      return updatedCount > 0;
+    } catch (e) {
+      return handleSequelizeError(e);
+    }
+  },
 };
 
-module.exports = proPlansModel;
+module.exports = proPlanRepository;

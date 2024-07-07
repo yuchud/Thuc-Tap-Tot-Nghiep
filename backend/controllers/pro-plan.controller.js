@@ -19,9 +19,26 @@ const proPlanController = {
   },
   createProPlan: async function (req, res) {
     const proPlan = req.body;
-    console.log(proPlan);
+    console.log(proPlanData);
     baseController.handleRequest(
-      () => proPlanService.createProPlan(proPlan),
+      () => proPlanService.createProPlan(proPlanData),
+      req,
+      res
+    );
+  },
+  updateProPlan: async function (req, res) {
+    const id = req.params.id;
+    const proPlanData = req.body;
+    baseController.handleRequest(
+      () => proPlanService.updateProPlan(id, proPlanData),
+      req,
+      res
+    );
+  },
+  deleteProPlan: async function (req, res) {
+    const id = req.params.id;
+    baseController.handleRequest(
+      () => proPlanService.deleteProPlan(id),
       req,
       res
     );

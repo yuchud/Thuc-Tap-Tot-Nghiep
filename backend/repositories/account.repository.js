@@ -6,7 +6,7 @@ const appConfig = require("../config/app.config");
 const { hashPassword, comparePassword } = require("../utils/hashing.utils");
 
 const accountModel = {
-  isAccountDuplicated: async function (usernameOrEmail) {
+  isAccountDuplicated: async (usernameOrEmail) => {
     try {
       const account = await AccountModel.findOne({
         where: {
@@ -21,7 +21,7 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  isEmailDuplicated: async function (email) {
+  isEmailDuplicated: async (email) => {
     try {
       const account = await AccountModel.findOne({ where: { email: email } });
       return account !== null;
@@ -29,7 +29,7 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  isUsernameDuplicated: async function (username) {
+  isUsernameDuplicated: async (username) => {
     try {
       const account = await AccountModel.findOne({
         where: { username: username },
@@ -39,15 +39,15 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  createAccount: async function (accountData) {
+  getAllAccounts: async () => {
     try {
-      const account = await AccountModel.create(accountData);
-      return account.id;
+      const accounts = await AccountModel.findAll();
+      return accounts;
     } catch (e) {
       return handleSequelizeError(e);
     }
   },
-  getAccountById: async function (id) {
+  getAccountById: async (id) => {
     try {
       const account = await AccountModel.findByPk(id);
       if (!account) {
@@ -58,10 +58,32 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  isPasswordCorrect: async function (firstPassword, secondPassword) {
+  getAccountByUserNameOrEmail: async (usernameOrEmail) => {
+    try {
+      return await AccountModel.findOne({
+        where: {
+          [db.Sequelize.Op.or]: [
+            { username: usernameOrEmail },
+            { email: usernameOrEmail },
+          ],
+        },
+      });
+    } catch (e) {
+      return handleSequelizeError(e);
+    }
+  },
+  createAccount: async (accountData) => {
+    try {
+      const account = await AccountModel.create(accountData);
+      return account.id;
+    } catch (e) {
+      return handleSequelizeError(e);
+    }
+  },
+  isPasswordCorrect: async (firstPassword, secondPassword) => {
     return await comparePassword(firstPassword, secondPassword);
   },
-  updatePassword: async function (id, newPassword) {
+  updatePassword: async (id, newPassword) => {
     try {
       const hashedPassword = await hashPassword(newPassword);
       const [updateCount] = await AccountModel.update(
@@ -73,27 +95,13 @@ const accountModel = {
       return handleSequelizeError(e);
     }
   },
-  changeUsername: async function (id, username) {
+  updateUsername: async function (id, newUsername) {
     try {
       const result = await AccountModel.update(
-        { username: username },
+        { username: newUsername },
         { where: { id: id } }
       );
       return result.affectedRows > 0;
-    } catch (e) {
-      return handleSequelizeError(e);
-    }
-  },
-  getAccountByUserNameOrEmail: async function (usernameOrEmail) {
-    try {
-      return await AccountModel.findOne({
-        where: {
-          [db.Sequelize.Op.or]: [
-            { username: usernameOrEmail },
-            { email: usernameOrEmail },
-          ],
-        },
-      });
     } catch (e) {
       return handleSequelizeError(e);
     }

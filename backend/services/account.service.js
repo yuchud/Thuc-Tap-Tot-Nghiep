@@ -4,7 +4,13 @@ const ErrorTypes = require("../utils/error-types.util");
 const sequelize = require("../src/db-connection");
 
 const accountService = {
-  createAccount: async function (account) {
+  getAllAccounts: async () => {
+    return accountRepository.getAllAccounts();
+  },
+  getAccountById: async (id) => {
+    return accountRepository.getAccountById(id);
+  },
+  createAccount: async (account) => {
     const t = await sequelize.transaction();
     try {
       const isUsernameDuplicated = await accountRepository.isUsernameDuplicated(
@@ -28,10 +34,7 @@ const accountService = {
       const account_id = await accountRepository.createAccount(account, {
         transaction: t,
       });
-      await customerRepository.createCustomer(
-        account_id,
-        { transaction: t }
-      );
+      await customerRepository.createCustomer(account_id, { transaction: t });
 
       await t.commit();
       return account_id;
@@ -41,15 +44,11 @@ const accountService = {
     }
   },
 
-  getAccountById: async function (id) {
-    return accountRepository.getAccountById(id);
-  },
-
-  updatePassword: async function (id, newPassword) {
+  updatePassword: async (id, newPassword) => {
     return accountRepository.updatePassword(id, newPassword);
   },
 
-  login: async function (usernameOrEmail, password) {
+  login: async (usernameOrEmail, password) => {
     const user = await accountRepository.getAccountByUserNameOrEmail(
       usernameOrEmail
     );
@@ -57,7 +56,10 @@ const accountService = {
       return ErrorTypes.Account.NOT_FOUND;
     }
 
-    const isPasswordCorrect = accountRepository.isPasswordCorrect(password, user.password);
+    const isPasswordCorrect = accountRepository.isPasswordCorrect(
+      password,
+      user.password
+    );
     if (!isPasswordCorrect) {
       return ErrorTypes.Account.WRONG_PASSWORD;
     }

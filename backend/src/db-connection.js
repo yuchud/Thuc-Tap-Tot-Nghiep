@@ -1,6 +1,7 @@
 require("dotenv").config();
 const dbConfig = require("../config/db.config");
 const Sequelize = require("sequelize");
+const ProPlanModel = require("../models/pro-plan.model");
 
 const sequelize = new Sequelize(
   dbConfig.database,
@@ -17,6 +18,7 @@ const models = {
   AccountModel: require("../models/account.model").init(sequelize),
   DeckModel: require("../models/deck.model").init(sequelize),
   CustomerModel: require("../models/customer.model").init(sequelize),
+  ProPlanModel: require("../models/pro-plan.model").init(sequelize),
 };
 
 Object.values(models)
