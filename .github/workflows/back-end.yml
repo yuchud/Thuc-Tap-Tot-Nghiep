@@ -54,7 +54,7 @@ jobs:
           
       - name: Load SQL dump
         run: |
-          mysql -h 127.0.0.1 -u root --password=root flashcard < ./backend/src/sql_test.sql
+          mysql -h 172.18.0.1 -u root --password=root flashcard < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
