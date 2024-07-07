@@ -22,8 +22,11 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: root
           MYSQL_DATABASE: flashcard
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_HOST: '%'
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=3
@@ -54,7 +57,7 @@ jobs:
           
       - name: Load SQL dump
         run: |
-          mysql -h 172.18.0.1 -u root --password=root flashcard < ./backend/src/sql_test.sql
+          mysql -h 172.18.0.1 -u root flashcard < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
