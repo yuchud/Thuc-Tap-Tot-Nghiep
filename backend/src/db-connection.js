@@ -1,7 +1,6 @@
 require("dotenv").config();
 const dbConfig = require("../config/db.config");
 const Sequelize = require("sequelize");
-const ProPlanModel = require("../models/pro-plan.model");
 
 const sequelize = new Sequelize(
   dbConfig.database,
