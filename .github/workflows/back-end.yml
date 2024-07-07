@@ -22,9 +22,8 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_DATABASE: flashcard
-          MYSQL_ROOT_HOST: '%'
-          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: testdb
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=3
@@ -47,15 +46,14 @@ jobs:
 
       - name: Set up environment variables
         run: |
-          echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
-          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" .env
-          echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
-          echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
+          echo "DB_HOST=127.0.0.1" >> .env
+          echo "DB_USER=root" >> .env
+          echo "DB_PASSWORD=password" >> .env
+          echo "DB_NAME=testdb" >> .env
           
       - name: Load SQL dump
         run: |
-          mysql -h 172.18.0.1 -u root flashcard < ./backend/src/sql_test.sql
+              mysql -h localhost -u root --password=password testdb < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
