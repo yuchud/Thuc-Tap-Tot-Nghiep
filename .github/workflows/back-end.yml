@@ -18,15 +18,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    services:
-      mysql:
-        image: mysql:5.7
-        env:
-          MYSQL_ROOT_PASSWORD: password
-          MYSQL_DATABASE: testdb
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=3
+    # services:
+    #   mysql:
+    #     image: mysql:5.7
+    #     env:
+    #       MYSQL_ROOT_PASSWORD: password
+    #       MYSQL_DATABASE: testdb
+    #     ports:
+    #       - 3306:3306
+    #     options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=5s --health-retries=3
 
     strategy:
       matrix:
@@ -50,10 +50,15 @@ jobs:
           echo "DB_USER=root" >> .env
           echo "DB_PASSWORD=password" >> .env
           echo "DB_NAME=testdb" >> .env
-          
-      - name: Load SQL dump
+
+      - name: Setup MySql In Github Actions
         run: |
-              mysql -h 127.0.0.1 -u root --password=password testdb < ./backend/src/sql_test.sql
+          sudo apt-get install -y mysql-client
+          mysql -h 127.0.0.1 -u root --password=password testdb < ./backend/src/sql_test.sql
+
+      # - name: Load SQL dump
+      #   run: |
+      #         mysql -h 127.0.0.1 -u root --password=password testdb < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
