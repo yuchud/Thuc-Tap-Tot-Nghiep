@@ -54,7 +54,7 @@ jobs:
           
       - name: Load SQL dump
         run: |
-          mysql -h DB_HOST -u DB_USER -p DB_PASSWORD DB_DATABASE < ./backend/db/flashcard.sql
+          mysql -h DB_HOST -u DB_USER -p DB_PASSWORD DB_DATABASE < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
