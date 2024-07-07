@@ -53,7 +53,7 @@ jobs:
           
       - name: Load SQL dump
         run: |
-              mysql -h localhost -u root --password=password testdb < ./backend/src/sql_test.sql
+              mysql -h 127.0.0.1 -u root --password=password testdb < ./backend/src/sql_test.sql
             
       - name: Run tests
         working-directory: ./backend
