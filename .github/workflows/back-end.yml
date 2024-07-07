@@ -17,6 +17,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0.34
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: flashcard
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
     strategy:
       matrix:
         node: [ 14, 16, 18 , 20]
@@ -24,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Use Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
@@ -41,6 +52,10 @@ jobs:
           echo "DB_DATABASE=${{ secrets.DB_DATABASE }}" >> .env
           echo "DB_PORT=${{ secrets.DB_PORT }}" >> .env
           
+      - name: Load SQL dump
+        run: |
+          mysql -h DB_HOST -u DB_USER -p DB_PASSWORD DB_DATABASE < ./backend/db/flashcard.sql
+            
       - name: Run tests
         working-directory: ./backend
         run: npm test
