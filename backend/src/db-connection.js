@@ -35,6 +35,9 @@ async function init() {
   }
 }
 
-init();
+if (process.env.NODE_ENV === "development") {
+  init();
+}
+
 
 module.exports = sequelize;
