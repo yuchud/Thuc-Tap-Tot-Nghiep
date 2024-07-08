@@ -1,9 +1,9 @@
-const db = require("../src/db-connection");
+const db = require("../db-connection");
 const jwt = require("jsonwebtoken");
 const AccountModel = require("../models/account.model");
 const handleSequelizeError = require("../utils/sequelize-error-handler.util");
 const appConfig = require("../config/app.config");
-const { hashPassword, comparePassword } = require("../utils/hashing.utils");
+const { hashPassword, comparePassword } = require("../utils/hashing.util");
 
 const accountModel = {
   isAccountDuplicated: async (usernameOrEmail) => {
@@ -51,7 +51,7 @@ const accountModel = {
     try {
       const account = await AccountModel.findByPk(id);
       if (!account) {
-        throw new Error("Account not found");
+        return { error: "Account not found" };
       }
       return account;
     } catch (e) {

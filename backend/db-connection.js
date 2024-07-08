@@ -1,5 +1,5 @@
 require("dotenv").config();
-const dbConfig = require("../config/db.config");
+const dbConfig = require("./config/db.config");
 const Sequelize = require("sequelize");
 
 const sequelize = new Sequelize(
@@ -13,11 +13,11 @@ const sequelize = new Sequelize(
 );
 
 const models = {
-  AccountRoleModel: require("../models/account-role.model").init(sequelize),
-  AccountModel: require("../models/account.model").init(sequelize),
-  DeckModel: require("../models/deck.model").init(sequelize),
-  CustomerModel: require("../models/customer.model").init(sequelize),
-  ProPlanModel: require("../models/pro-plan.model").init(sequelize),
+  AccountRoleModel: require("./models/account-role.model").init(sequelize),
+  AccountModel: require("./models/account.model").init(sequelize),
+  DeckModel: require("./models/deck.model").init(sequelize),
+  CustomerModel: require("./models/customer.model").init(sequelize),
+  ProPlanModel: require("./models/pro-plan.model").init(sequelize),
 };
 
 Object.values(models)

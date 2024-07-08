@@ -1,5 +1,5 @@
 const express = require('express');
-const proPlanController = require('../../controllers/pro-plan.controller');
+const proPlanController = require('../controllers/pro-plan.controller');
 const router = express.Router();
 
 router.get('/', proPlanController.getAllProPlans);

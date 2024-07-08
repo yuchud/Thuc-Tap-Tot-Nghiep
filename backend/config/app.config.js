@@ -1,6 +1,6 @@
 module.exports = {
-    PORT: process.env.PORT || 3000, 
-    USER_ROLES: {
+    DEV_PORT: process.env.PORT || 3000, 
+    USER_ROLE: {
         ADMIN: 1,
         CUSTOMER: 2
     },
