@@ -1,6 +1,6 @@
-require("dotenv").config();
-const dbConfig = require("./config/db.config");
-const Sequelize = require("sequelize");
+require('dotenv').config();
+const dbConfig = require('./config/db.config');
+const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize(
   dbConfig.database,
@@ -13,31 +13,30 @@ const sequelize = new Sequelize(
 );
 
 const models = {
-  AccountRoleModel: require("./models/account-role.model").init(sequelize),
-  AccountModel: require("./models/account.model").init(sequelize),
-  DeckModel: require("./models/deck.model").init(sequelize),
-  CustomerModel: require("./models/customer.model").init(sequelize),
-  ProPlanModel: require("./models/pro-plan.model").init(sequelize),
+  AccountRoleModel: require('./models/account-role.model').init(sequelize),
+  AccountModel: require('./models/account.model').init(sequelize),
+  DeckModel: require('./models/deck.model').init(sequelize),
+  ProPlanModel: require('./models/pro-plan.model').init(sequelize),
+  CourseModel: require('./models/course.model').init(sequelize),
 };
 
 Object.values(models)
-  .filter((model) => typeof model.associate === "function")
+  .filter((model) => typeof model.associate === 'function')
   .forEach((model) => model.associate(models));
 
 async function init() {
   try {
     await sequelize.authenticate();
-    console.log("Connection has been established successfully.");
+    console.log('Connection has been established successfully.');
     await sequelize.sync();
-    console.log("All models were synchronized successfully.");
+    console.log('All models were synchronized successfully.');
   } catch (error) {
-    console.error("Unable to connect to the database:", error);
+    console.error('Unable to connect to the database:', error);
   }
 }
 
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === 'development') {
   init();
 }
-
 
 module.exports = sequelize;

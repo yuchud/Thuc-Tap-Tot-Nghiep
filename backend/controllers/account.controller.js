@@ -37,18 +37,22 @@ const accountController = {
   createAccount: async (req, res) => {
     const account = req.body;
     try {
-      const isUsernameDuplicated = await accountService.isUsernameDuplicated(account.username);
+      const isUsernameDuplicated = await accountService.isUsernameDuplicated(
+        account.username
+      );
       if (isUsernameDuplicated) {
         res
           .status(http.StatusCodes.BAD_REQUEST)
-          .json({ error: "Username is duplicated" });
+          .json({ error: "Username is already used" });
         return;
       }
-      const isEmailDuplicated = await accountService.isEmailDuplicated(account.email);
+      const isEmailDuplicated = await accountService.isEmailDuplicated(
+        account.email
+      );
       if (isEmailDuplicated) {
         res
           .status(http.StatusCodes.BAD_REQUEST)
-          .json({ error: "Email is duplicated" });
+          .json({ error: "Email is already used" });
         return;
       }
       const result = await accountService.createAccount(account);
@@ -64,7 +68,10 @@ const accountController = {
     const account_id = req.params.id;
     const newPassword = req.body.password;
     try {
-      const result = await accountService.updatePassword(account_id, newPassword);
+      const result = await accountService.updatePassword(
+        account_id,
+        newPassword
+      );
       res.status(http.StatusCodes.OK).json(result);
     } catch (error) {
       res
@@ -87,11 +94,18 @@ const accountController = {
         return;
       }
 
+      if (account.account_role_id === appConfig.USER_ROLE.ADMIN) {
+        res
+          .status(http.StatusCodes.UNAUTHORIZED)
+          .json({ error: "Username is already used" });
+        return;
+      }
+
       const isPasswordCorrect = await accountService.isPasswordCorrect(
         password,
         account.password
       );
-      
+
       if (!isPasswordCorrect) {
         res
           .status(http.StatusCodes.UNAUTHORIZED)
@@ -99,8 +113,50 @@ const accountController = {
         return;
       }
 
-      await accountService.getToken(account);
-      res.status(http.StatusCodes.OK).json({ message: "Login successfully" });
+      const loginResult = await accountService.getToken(account);
+      res.status(http.StatusCodes.OK).json(loginResult);
+    } catch (error) {
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+
+  adminLogin: async (req, res) => {
+    try {
+      const usernameOrEmail = req.body.usernameOrEmail;
+      const password = req.body.password;
+      const account = await accountService.getAccountByUserNameOrEmail(
+        usernameOrEmail
+      );
+      if (!account) {
+        res
+          .status(http.StatusCodes.UNAUTHORIZED)
+          .json({ error: "Username or email not found" });
+        return;
+      }
+      console.log(account.account_role_id);
+      if (account.account_role_id !== appConfig.USER_ROLE.ADMIN) {
+        res
+          .status(http.StatusCodes.UNAUTHORIZED)
+          .json({ error: "You are not allowed to login here" });
+        return;
+      }
+
+      const isPasswordCorrect = await accountService.isPasswordCorrect(
+        password,
+        account.password
+      );
+
+      if (!isPasswordCorrect) {
+        res
+          .status(http.StatusCodes.UNAUTHORIZED)
+          .json({ error: "Password is incorrect" });
+        return;
+      }
+
+      const loginResult = await accountService.getToken(account);
+      res.status(http.StatusCodes.OK).json(loginResult);
     } catch (error) {
       res
         .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
@@ -124,7 +180,7 @@ const accountController = {
         .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: error.message });
     }
-  }, 
+  },
 };
 
 module.exports = accountController;

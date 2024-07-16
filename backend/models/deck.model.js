@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes } = require('sequelize');
 
 class DeckModel extends Sequelize.Model {
   static init(sequelize) {
@@ -30,13 +30,26 @@ class DeckModel extends Sequelize.Model {
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+        updated_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+        course_id: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          references: {
+            model: 'Course',
+            key: 'id',
+          },
         },
       },
       {
         sequelize,
-        modelName: "Deck",
-        tableName: "decks",
+        modelName: 'Deck',
+        tableName: 'decks',
         timestamps: false,
       }
     );
