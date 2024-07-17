@@ -5,6 +5,7 @@ const actionCreate = require('../utils/props-and-objects.util').ACTIONS.CREATE;
 const actionUpdate = require('../utils/props-and-objects.util').ACTIONS.UPDATE;
 const actionDelete = require('../utils/props-and-objects.util').ACTIONS.DELETE;
 const nameProp = require('../utils/props-and-objects.util').PROS.NAME;
+const DECK = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const requestMessageUtil = require('../utils/requestMessage.util');
 
 const courseController = {
@@ -13,6 +14,23 @@ const courseController = {
       const { page, limit } = req.query;
       const courses = await courseService.getAllCourses(+page, +limit);
       res.status(http.StatusCodes.OK).json(courses);
+    } catch (error) {
+      console.log(error);
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+  getCourseById: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const course = await courseService.getCourseById(id);
+      if (!course) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(objectName),
+        });
+      }
+      res.status(http.StatusCodes.OK).json(course);
     } catch (error) {
       console.log(error);
       res
@@ -95,12 +113,29 @@ const courseController = {
   deleteCourse: async (req, res) => {
     const { id } = req.params;
     try {
-      const deletedCourse = await courseService.deleteCourse(id);
-      if (!deletedCourse) {
+      const course = await courseService.getCourseById(id);
+      if (!course) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),
         });
       }
+      if (course.deck_count > 0) {
+        console.log(
+          requestMessageUtil.cannotDeleteObjectWithChild(objectName, [DECK])
+        );
+        return res.status(http.StatusCodes.BAD_REQUEST).json({
+          message: requestMessageUtil.cannotDeleteObjectWithChild(objectName, [
+            DECK,
+          ]),
+        });
+      }
+      const deletedCourse = await courseService.deleteCourse(id);
+      if (deletedCourse.hasOwnProperty('error')) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(objectName),
+        });
+      }
+
       res.status(http.StatusCodes.OK).json({
         message: requestMessageUtil.successActionObject(
           actionDelete,
@@ -108,7 +143,6 @@ const courseController = {
         ),
       });
     } catch (error) {
-      console.log(error);
       res
         .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ error: error.message });

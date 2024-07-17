@@ -18,6 +18,10 @@ class DeckModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: 0,
         },
+        image_url: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         description: {
           type: DataTypes.TEXT,
           allowNull: true,

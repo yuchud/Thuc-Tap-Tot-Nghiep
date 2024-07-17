@@ -22,6 +22,15 @@ const courseService = {
       return error;
     }
   },
+  getCourseById: async (courseId) => {
+    try {
+      const course = await courseModel.findByPk(courseId);
+      return course;
+    } catch (error) {
+      console.log(error);
+      return error;
+    }
+  },
   getCourseByName: async (name) => {
     try {
       const course = await courseModel.findOne({

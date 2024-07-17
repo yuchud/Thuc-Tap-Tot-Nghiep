@@ -6,7 +6,7 @@ const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
 
 router.get('/', deckController.getAllDecks);
-router.get('/course-id/:courseId', deckController.getDecksByCourseId);
+router.get('/:id', deckController.getDeckById);
 
 router.post('/', upload.single('file'), deckController.createDeck);
 

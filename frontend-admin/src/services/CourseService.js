@@ -13,6 +13,19 @@ export const fetchGetAllCourses = async (page = 1, limit = 10) => {
   }
 };
 
+export const fetchGetCourseById = async (courseId) => {
+  try {
+    //const response = await axios.get(`${BASE_API_URL}/courses/${courseId}`);
+    const response = await fetch(`${BASE_API_URL}/courses/${courseId}`, {
+      method: 'GET',
+    });
+    console.log(response);
+    return response.json();
+  } catch (error) {
+    return error;
+  }
+};
+
 export const fetchUpdateCourse = async (courseId, courseData) => {
   try {
     //const result = await axios.put(`${BASE_API_URL}/courses/${courseId}`, courseData);
@@ -59,6 +72,12 @@ export const fetchDeleteCourse = async (courseId) => {
     const response = await fetch(`${BASE_API_URL}/courses/${courseId}`, {
       method: 'DELETE',
     });
+    if (!response.ok) {
+      if (response.status === http.BAD_REQUEST) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    }
     return response.json();
   } catch (error) {
     return { error: error.message };

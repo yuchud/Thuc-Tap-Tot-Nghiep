@@ -5,6 +5,7 @@ import Button from '@mui/material/Button';
 import React from 'react';
 import { fetchGetAllCourses } from 'src/services/CourseService';
 
+import { useLocation } from 'react-router-dom';
 import Modal from '@mui/material/Modal';
 import { Typography } from '@mui/material';
 import { TextField } from '@mui/material';
@@ -23,39 +24,51 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
 import { toTitleCase } from '../utilities/stringUtils';
 import { isNameEmpty } from '../utilities/stringUtils';
-import DeleteConfirmModal from '../../components/modal/DeleteConfirmModal';
-import CustomerSnackbar from '../../components/snackbar/CustomSnackbar';
-import CustomTextArea from '../../components/forms/theme-elements/CustomTextArea';
 import { toSentenceCase } from '../utilities/stringUtils';
+import DeleteConfirmModal from '../../components/modal/DeleteConfirmModal';
+import CustomSnackbar from '../../components/snackbar/CustomSnackbar';
+import CustomTextArea from '../../components/forms/theme-elements/CustomTextArea';
 
+import { useNavigate } from 'react-router';
 const Courses = () => {
   const [courses, setCourses] = React.useState([]);
+  const [selectedCourse, setSelectedCourse] = React.useState({});
   const [courseUpdated, setCourseUpdated] = React.useState(false);
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [deletedCourseId, setDeletedCourseId] = React.useState(null);
+  const [currentPage, setCurrentPage] = React.useState(0);
   const [coursesPerPage] = React.useState(12);
+  const [totalPages, setTotalPages] = React.useState(0);
+
   const [image, setImage] = React.useState(null);
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
-  const [selectedCourse, setSelectedCourse] = React.useState({});
+  const [previewImage, setPreviewImage] = React.useState(null);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState('success');
+
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [previewImage, setPreviewImage] = React.useState(null);
-  const [totalPages, setTotalPages] = React.useState(0);
-  const [nameError, setNameError] = React.useState('');
-  const [isNameValid, setIsNameValid] = React.useState(true);
-  const [modalSubmitName, setModalSubmitName] = React.useState();
   const [isCreateMode, setIsCreateMode] = React.useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = React.useState(false);
-  const [deletedCourseId, setDeletedCourseId] = React.useState(null);
+  const [modalSubmitName, setModalSubmitName] = React.useState();
+
+  const [isNameValid, setIsNameValid] = React.useState(true);
+  const [nameError, setNameError] = React.useState('');
+
   const [isPublic, setIsPublic] = React.useState(false);
   const [isNeedPro, setIsNeedPro] = React.useState(false);
+
+  const navigate = useNavigate();
   const fetchCourses = async () => {
     const fetchedCourses = await fetchGetAllCourses(currentPage, coursesPerPage);
     if (fetchedCourses) {
       setCourses(fetchedCourses.courses);
       setTotalPages(fetchedCourses.totalPages);
+      if (currentPage > fetchedCourses.totalPages) {
+        setCurrentPage(fetchedCourses.totalPages);
+        return;
+      }
     }
   };
 
@@ -123,8 +136,10 @@ const Courses = () => {
     }
 
     const formData = new FormData();
-    formData.append('name', name);
-    formData.append('description', description);
+    const newName = toTitleCase(name);
+    const newDescription = toSentenceCase(description);
+    formData.append('name', newName);
+    formData.append('description', newDescription);
     formData.append('file', image);
 
     try {
@@ -151,10 +166,12 @@ const Courses = () => {
   const handleDeleteCourse = async (courseId) => {
     try {
       const result = await fetchDeleteCourse(courseId);
+      console.log(result);
       if (result.hasOwnProperty('error')) {
         setSnackbarSeverity('error');
         setSnackbarMessage(result.error);
         setSnackbarOpen(true);
+        console.log(result.error);
         return;
       }
       setSnackbarSeverity('success');
@@ -162,6 +179,7 @@ const Courses = () => {
       setSnackbarOpen(true);
       fetchCourses();
       handleCloseModal();
+      console.log('Deleted course');
     } catch (error) {
       setSnackbarSeverity('error');
       setSnackbarMessage(error.message);
@@ -227,8 +245,26 @@ const Courses = () => {
   }, [selectedCourse]);
 
   React.useEffect(() => {
+    //console.log(currentPage);
+    if (currentPage === 0) {
+      setCurrentPage(1);
+      return;
+    }
+
     fetchCourses();
+    //console.log(currentPage);
   }, [currentPage]);
+
+  const location = useLocation();
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+
+    const page = searchParams.get('page');
+    //console.log(page);
+    setCurrentPage(page ? parseInt(page) : 1);
+    //fetchCourses(page);
+    //console.log(2);
+  }, [location]);
 
   return (
     <PageContainer title="Quản lý khóa học" description="Trang quản lý khóa học">
@@ -236,7 +272,7 @@ const Courses = () => {
         <Typography variant="h1" id="modal-modal-title" sx={{ mt: 2 }}>
           Quản lý khóa học
         </Typography>
-        <CustomerSnackbar
+        <CustomSnackbar
           open={snackbarOpen}
           severity={snackbarSeverity}
           message={snackbarMessage}
@@ -251,7 +287,7 @@ const Courses = () => {
           aria-describedby="modal-modal-description"
         >
           <Box className="modal-style">
-            <CustomerSnackbar
+            <CustomSnackbar
               open={snackbarOpen}
               severity={snackbarSeverity}
               message={snackbarMessage}
@@ -340,7 +376,6 @@ const Courses = () => {
         </Button>
         <CourseItems
           courses={courses}
-          onCourseUpdate={() => setCourseUpdated(!courseUpdated)}
           onUpdateCourseClick={(course) => handleUpdateCourseClick(course)}
           onDeleteCourseClick={(courseId) => handleDeleteCourseClick(courseId)}
         ></CourseItems>
@@ -349,7 +384,7 @@ const Courses = () => {
       <Pagination
         count={totalPages}
         page={currentPage}
-        onChange={(e, page) => setCurrentPage(page)}
+        onChange={(e, page) => navigate(`/courses?page=${page}`)}
         sx={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}
       />
     </PageContainer>

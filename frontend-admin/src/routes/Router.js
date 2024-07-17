@@ -29,8 +29,10 @@ const Router = [
     children: [
       { path: '/', element: <Navigate to="/dashboard" /> },
       { path: '/dashboard', exact: true, element: <Dashboard /> },
+      { path: '/courses/:courseId/decks', exact: true, element: <Decks /> },
       { path: '/courses', exact: true, element: <Courses /> },
-      { path: 'desks/course-id/:id', exact: true, element: <Decks /> },
+
+      // { path: 'desks', exact: true, element: <Decks /> },
       { path: '/users', exact: true, element: <Users /> },
       { path: '/sample-page', exact: true, element: <SamplePage /> },
       { path: '/icons', exact: true, element: <Icons /> },

@@ -21,10 +21,29 @@ const deckController = {
     }
   },
 
-  getDecksByCourseId: async (req, res) => {
-    const { courseId } = req.params;
+  getDeckById: async (req, res) => {
+    const { id } = req.params;
     try {
-      const decks = await deckService.getDecksByCourseId(courseId);
+      const deck = await deckService.getDeckById(id);
+      if (!deck) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(objectName),
+        });
+      }
+      res.status(http.StatusCodes.OK).json(deck);
+    } catch (error) {
+      console.log(error);
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+
+  getDecksByCourseId: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const { page, limit } = req.query;
+      const decks = await deckService.getDecksByCourseId(id, +page, +limit);
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
@@ -73,7 +92,7 @@ const deckController = {
 
   updateDeck: async (req, res) => {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, is_public } = req.body;
     const image = req.file;
     try {
       if (!name.trim()) {
@@ -94,6 +113,7 @@ const deckController = {
         name,
         description,
         image,
+        is_public,
       });
       res.status(http.StatusCodes.OK).json({
         message: requestMessageUtil.successActionObject(
@@ -113,6 +133,7 @@ const deckController = {
     const { id } = req.params;
     try {
       const deleteDeck = await deckService.deleteDeck(id);
+
       if (!deleteDeck) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),

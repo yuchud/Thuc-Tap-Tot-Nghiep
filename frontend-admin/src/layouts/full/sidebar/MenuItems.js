@@ -51,9 +51,9 @@ const Menuitems = [
   },
   {
     id: uniqueId(),
-    title: 'Create Course',
+    title: 'Desks',
     icon: IconCertificate,
-    href: '/courses/create',
+    href: '/desks/course-id/:id',
   },
   {
     navlabel: true,

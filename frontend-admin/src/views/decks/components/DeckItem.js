@@ -22,10 +22,10 @@ import styled from '@mui/material/styles/styled';
 import '../../../assets/css/courseCard.css';
 
 import Divider from '@mui/material/Divider';
-import CourseTags from './CourseTags';
+import DeckTags from '../../courses/components/CourseTags';
 import { useNavigate } from 'react-router';
 
-const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
+const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
   const CardActionsStyled = styled(CardActions)({
     display: 'flex',
     justifyContent: 'space-between',
@@ -42,8 +42,8 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
   });
   const navigate = useNavigate();
 
-  const openCourse = (courseId) => {
-    navigate(`/courses/${courseId}/decks`);
+  const openDeck = (deckId) => {
+    navigate(`/decks/${deckId}/decks`);
   };
 
   const renderCardDescription = (description) => {
@@ -59,10 +59,10 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
   return (
     <Box>
       <Card sx={{ maxWidth: 345 }}>
-        <CardMedia image={course.image_url} className="course-image" title="green iguana" />
+        <CardMedia image={deck.image_url} className="course-image" title="green iguana" />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
-            {course.name}
+            {deck.name}
           </Typography>
           <Typography
             variant="body1"
@@ -77,28 +77,28 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
               maxHeight: '4.5em',
             }}
           >
-            {renderCardDescription(course.description)}
+            {renderCardDescription(deck.description)}
           </Typography>
           <Divider />
-          <CourseTags is_public={course.is_public} is_need_pro={course.is_need_pro} />
+          <DeckTags is_public={deck.is_public} />
         </CardContent>
 
         <CardActionsStyled>
           <BottomNavigation showLabels sx={{ width: '100%' }}>
             <BottomNavigationActionStyled
-              label="Xem bộ thẻ"
+              label="Xem thẻ"
               icon={<LaunchIcon />}
-              onClick={() => openCourse(course.id)}
+              onClick={() => openDeck(deck.id)}
             />
             <BottomNavigationActionStyled
               label="Chỉnh sửa"
               icon={<UpdateIcon />}
-              onClick={() => onUpdateCourseClick(course)}
+              onClick={() => onUpdateDeckClick(deck)}
             />
             <BottomNavigationActionStyled
               label="Xóa"
               icon={<DeleteForeverIconStyled />}
-              onClick={() => onDeleteCourseClick(course.id)}
+              onClick={() => onDeleteDeckClick(deck.id)}
             />
           </BottomNavigation>
         </CardActionsStyled>
@@ -107,4 +107,4 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
   );
 };
 
-export default CourseItem;
+export default DeckItem;

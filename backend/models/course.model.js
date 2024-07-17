@@ -22,10 +22,15 @@ class CoursesModel extends Sequelize.Model {
           type: DataTypes.STRING,
           allowNull: true,
         },
-        desk_count: {
+        deck_count: {
           type: DataTypes.INTEGER,
           allowNull: false,
           defaultValue: 0,
+        },
+        deck_limit: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 10,
         },
         is_public: {
           type: DataTypes.BOOLEAN,

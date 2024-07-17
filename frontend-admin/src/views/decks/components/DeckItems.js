@@ -1,9 +1,9 @@
 import React from 'react';
-import CourseItem from './CourseItem';
+import DeckItem from './DeckItem';
 import Grid from '@mui/material/Grid';
 import '../../../assets/css/modal-style.css';
 
-const CourseItems = ({ courses, onUpdateCourseClick, onDeleteCourseClick }) => {
+const DeckItems = ({ decks, onUpdateDeckClick, onDeleteDeckClick }) => {
   return (
     <Grid
       container
@@ -11,13 +11,13 @@ const CourseItems = ({ courses, onUpdateCourseClick, onDeleteCourseClick }) => {
       columns={{ xs: 3, sm: 8, md: 12 }}
       className="grid-container flex-center"
     >
-      {courses.map((course, index) => (
+      {decks.map((deck, index) => (
         <Grid item xs={2} sm={4} md={4} key={index}>
-          <CourseItem
+          <DeckItem
             sx={{ height: '100%' }}
-            course={course}
-            onUpdateCourseClick={(course) => onUpdateCourseClick(course)}
-            onDeleteCourseClick={(deletedCourseId) => onDeleteCourseClick(deletedCourseId)}
+            deck={deck}
+            onUpdateDeckClick={(deck) => onUpdateDeckClick(deck)}
+            onDeleteDeckClick={(deletedDeckId) => onDeleteDeckClick(deletedDeckId)}
           />
         </Grid>
       ))}
@@ -25,4 +25,4 @@ const CourseItems = ({ courses, onUpdateCourseClick, onDeleteCourseClick }) => {
   );
 };
 
-export default CourseItems;
+export default DeckItems;
