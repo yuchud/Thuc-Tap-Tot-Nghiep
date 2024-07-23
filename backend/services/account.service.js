@@ -3,10 +3,30 @@ const accountModel = require('../models/account.model');
 const { hashPassword, comparePassword } = require('../utils/hashing.util');
 const appConfig = require('../config/app.config');
 const jwt = require('jsonwebtoken');
+const azureStorage = require('../utils/azure-storage.util');
 const accountService = {
-  getAllAccounts: async () => {
+  getAllAccounts: async (page = 1, limit = 12) => {
     try {
-      return await accountModel.findAll();
+      page = parseInt(page);
+      limit = parseInt(limit);
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await accountModel.findAndCountAll({
+        where: {
+          account_role_id: {
+            [sequelize.Sequelize.Op.not]: appConfig.USER_ROLE.ADMIN,
+          },
+        },
+        limit: limit,
+        offset: offset,
+        attributes: { exclude: ['password'] },
+      });
+      return {
+        total: count,
+        accounts: rows,
+        totalPages: Math.ceil(count / limit),
+        currentPage: page,
+      };
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -15,7 +35,30 @@ const accountService = {
 
   getAccountById: async (id) => {
     try {
-      return await accountModel.findByPk(id);
+      return await accountModel.findOne({
+        where: {
+          id: id,
+          account_role_id: {
+            [sequelize.Sequelize.Op.not]: appConfig.USER_ROLE.ADMIN,
+          },
+        },
+        attributes: { exclude: ['password'] },
+      });
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
+  },
+
+  getAdminAccountById: async (id) => {
+    try {
+      return await accountModel.findOne({
+        where: {
+          id: id,
+          account_role_id: appConfig.USER_ROLE.ADMIN,
+        },
+        attributes: { exclude: ['password'] },
+      });
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -39,24 +82,36 @@ const accountService = {
     }
   },
 
-  isUsernameDuplicated: async (username) => {
+  isUsernameDuplicated: async (username, account_id = null) => {
     try {
       if (!username) return false;
       const account = await accountModel.findOne({
         where: { username: username },
       });
-      return account !== null;
+      if (!account) {
+        return false;
+      }
+      if (account && account.id == account_id) {
+        return false;
+      }
+      return true;
     } catch (error) {
       console.error(error);
       return { error: error.message };
     }
   },
 
-  isEmailDuplicated: async (email) => {
+  isEmailDuplicated: async (email, account_id = null) => {
     try {
       if (!email) return false;
       const account = await accountModel.findOne({ where: { email: email } });
-      return account !== null;
+      if (!account) {
+        return false;
+      }
+      if (account && account.id == account_id) {
+        return false;
+      }
+      return true;
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -112,14 +167,44 @@ const accountService = {
 
   getToken: async (account) => {
     try {
-      const account_id = account.id;
-      const user = await accountService.getAccountById(account_id);
+      // console.log(account.id);
+      // const account_id = account.id;
+      // const user = await accountService.getAccountById(account_id);
+      // console.log(account.account_role_id);
       const token = jwt.sign(
-        { id: user.id, role: user.account_role_id },
+        { id: account.id, role: account.account_role_id },
         appConfig.JWT_SECRET,
         { expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s` }
       );
+
       return { message: 'Login successfully', token: token };
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
+  },
+  updateAccount: async (account_id, account, avatar) => {
+    try {
+      let imageUrl = null;
+      if (avatar) {
+        imageUrl = await azureStorage.uploadImage(
+          (containerName = 'avatars'), // Azure container name
+          avatar
+        );
+      }
+
+      account.avatar_url = imageUrl ? imageUrl : account.avatar_url;
+      if (account.gmail === '') {
+        account.gmail = null;
+      }
+      // console.log(account);
+      const updatedAccount = await accountModel.update(account, {
+        where: { id: account_id },
+      });
+      if (!updatedAccount) {
+        return null;
+      }
+      return updatedAccount;
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -146,6 +231,22 @@ const accountService = {
       console.error(error);
       return { error: error.message };
     }
+  },
+  toggleAccountBannedStatus(account_id) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const account = await accountModel.findByPk(account_id);
+        if (!account) {
+          return reject({ error: 'Không tìm thấy tài khoản' });
+        }
+        account.is_banned = !account.is_banned;
+        await account.save();
+        resolve({ message: 'Thay đổi trạng thái khóa tài khoản thành công' });
+      } catch (error) {
+        console.error(error);
+        reject({ error: error.message });
+      }
+    });
   },
 };
 module.exports = accountService;

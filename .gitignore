@@ -1,3 +1,4 @@
 *.docx
 *.txt
 *.mwb
+node_modules

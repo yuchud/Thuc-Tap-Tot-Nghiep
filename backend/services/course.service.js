@@ -4,10 +4,15 @@ const azureStorage = require('../utils/azure-storage.util');
 const fs = require('fs');
 
 const courseService = {
-  getAllCourses: async (page = 1, limit = 10) => {
+  getAllCourses: async (page = 1, limit = 10, isPublic = null) => {
     try {
       const offset = (page - 1) * limit;
+      const whereClause = {};
+      if (isPublic !== null) {
+        whereClause.is_public = isPublic;
+      }
       const { count, rows } = await courseModel.findAndCountAll({
+        where: whereClause,
         limit: limit,
         offset: offset,
       });

@@ -3,6 +3,7 @@ module.exports = {
     COURSE: 'khóa học',
     DECK: 'bộ thẻ',
     ACCOUNT: 'tài khoản',
+    CARD: 'thẻ',
   },
 
   ACTIONS: {
@@ -11,9 +12,11 @@ module.exports = {
     DELETE: 'xóa',
   },
 
-  PROS: {
+  PROPS: {
     NAME: 'tên',
     USERNAME: 'tên đăng nhập',
     PASSWORD: 'mật khẩu',
+    FRONT_TEXT: 'nội dung mặt trước',
+    BACK_TEXT: 'nội dung mặt sau',
   },
 };

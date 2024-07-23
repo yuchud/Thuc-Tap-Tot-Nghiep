@@ -38,63 +38,60 @@ import { fetchCreateCourse } from 'src/services/CourseService';
 
 import { fetchCreateDeck } from 'src/services/DeckService';
 import { fetchUpdateDeck } from 'src/services/DeckService';
+import { fetchDeleteDeck } from 'src/services/DeckService';
 
 import Pagination from '@mui/material/Pagination';
 
 import { useLocation } from 'react-router-dom';
 import DeleteConfirmModal from 'src/components/modal/DeleteConfirmModal';
-import { fetchDeleteDeck } from 'src/services/DeckService';
+
 const Decks = () => {
+  // ** USE STATE ** //
+  // Course
   const courseId = useParams().courseId;
-
   const [course, setCourse] = React.useState({});
-  const [currentPage, setCurrentPage] = React.useState(0);
 
+  // Deck
   const [decks, setDecks] = React.useState([]);
   const [selectedDeck, setSelectedDeck] = React.useState({});
   const [deletedDeckId, setDeletedDeckId] = React.useState(null);
+
+  // Deck properties
   const [image, setImage] = React.useState(null);
   const [name, setName] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [previewImage, setPreviewImage] = React.useState(null);
+  const [isPublic, setIsPublic] = React.useState(false);
 
+  // Modal State
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isCreateMode, setIsCreateMode] = React.useState(false);
   const [isOpenDeleteModal, setIsOpenDeleteModal] = React.useState(false);
   const [modalSubmitName, setModalSubmitName] = React.useState();
 
+  // Modal Validation
   const [isNameValid, setIsNameValid] = React.useState(true);
   const [nameError, setNameError] = React.useState('');
 
+  // Snackbar
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [snackbarSeverity, setSnackbarSeverity] = React.useState('success');
 
+  // Pagination
   const [totalPages, setTotalPage] = React.useState(1);
-
-  const [isPublic, setIsPublic] = React.useState(false);
-
-  const location = useLocation();
-  React.useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const page = searchParams.get('page');
-    console.log('page', page);
-    setCurrentPage(page ? parseInt(page) : 1);
-    console.log('page', page);
-    const coursePage = searchParams.get('coursePage');
-    //fetchCourses(page);
-    //console.log(2);
-  }, [location]);
+  const [currentPage, setCurrentPage] = React.useState(0);
+  const [totalDecks, setTotalDecks] = React.useState(0);
 
   const navigate = useNavigate();
 
+  // ** GET ** //
   const handleGetCourse = async () => {
     try {
       const course = await fetchGetCourseById(courseId);
       if (course) {
         setCourse(course);
       }
-      console.log(course);
     } catch (error) {
       console.log(error);
     }
@@ -106,20 +103,17 @@ const Decks = () => {
       if (deckData) {
         setDecks(deckData.decks);
         setTotalPage(deckData.totalPages);
+        setTotalDecks(deckData.total);
         if (currentPage > deckData.totalPages) {
           setCurrentPage(deckData.totalPages);
         }
-        //console.log(totalPages);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleSnackbarClose = (event) => {
-    setSnackbarOpen(false);
-  };
-
+  // ** IMAGE ** //
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -127,13 +121,7 @@ const Decks = () => {
     }
   };
 
-  const handleUpdateDeckClick = (deck) => {
-    setSelectedDeck(deck);
-    setIsModalOpen(true);
-    setModalSubmitName('Chỉnh sửa bộ thẻ');
-    setIsCreateMode(false);
-  };
-
+  // ** VALIDATION ** //
   const isFormValid = () => {
     let isFormValid = true;
     setIsNameValid(true);
@@ -146,6 +134,7 @@ const Decks = () => {
     return isFormValid;
   };
 
+  // ** CREATE ** //
   const handleCreateDeckClick = () => {
     // if (course.deck_count >= course.deck_limit) {
     //   setSnackbarMessage('Số lượng bộ thẻ đã đạt giới hạn');
@@ -154,22 +143,49 @@ const Decks = () => {
     //   return;
     // }
     setIsModalOpen(true);
-    setName('');
-    setDescription('');
-    setImage(DEFAULT_DECK_IMAGE);
-    setPreviewImage(DEFAULT_DECK_IMAGE);
+    // setName('');
+    // setDescription('');
+    // setImage(DEFAULT_DECK_IMAGE);
+    // setPreviewImage(DEFAULT_DECK_IMAGE);
+    setSelectedDeck(null);
     setModalSubmitName('Tạo bộ thẻ');
     setIsCreateMode(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setIsNameValid(true);
-    setSelectedDeck(null);
-    setIsNameValid(true);
-    setNameError('');
+  const handleCreateDeck = async (e) => {
+    e.preventDefault();
+    if (!isFormValid()) {
+      return;
+    }
+    const formData = new FormData();
+    const newName = toTitleCase(name);
+    const newDescription = toSentenceCase(description);
+    formData.append('name', newName);
+    formData.append('description', newDescription);
+    formData.append('file', image);
+    formData.append('course_id', courseId);
+    try {
+      const result = await fetchCreateDeck(formData);
+      if (result.hasOwnProperty('error')) {
+        setSnackbarMessage(result.error);
+        setSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        return;
+      }
+
+      setSnackbarMessage('Tạo bộ thẻ thành công');
+      setSnackbarOpen(true);
+      setSnackbarSeverity('success');
+      refreshData();
+      handleCloseModal();
+    } catch (error) {
+      setSnackbarMessage(error.message);
+      setSnackbarOpen(true);
+      console.error(error);
+    }
   };
 
+  // ** UPDATE ** //
   const handleUpdateCourse = async (e) => {
     e.preventDefault();
     if (!isFormValid()) {
@@ -190,7 +206,6 @@ const Decks = () => {
         setSnackbarMessage(result.error);
         setSnackbarOpen(true);
         setSnackbarSeverity('error');
-        refreshData();
         return;
       }
 
@@ -208,42 +223,14 @@ const Decks = () => {
     }
   };
 
-  const handleCreateDeck = async (e) => {
-    e.preventDefault();
-    if (!isFormValid()) {
-      return;
-    }
-
-    const formData = new FormData();
-    const newName = toTitleCase(name);
-    const newDescription = toSentenceCase(description);
-    formData.append('name', newName);
-    formData.append('description', newDescription);
-    formData.append('file', image);
-    formData.append('course_id', courseId);
-    try {
-      const result = await fetchCreateDeck(formData);
-      if (result.hasOwnProperty('error')) {
-        setSnackbarMessage(result.error);
-        setSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        refreshData();
-        return;
-      }
-
-      setSnackbarMessage('Tạo bộ thẻ thành công');
-      setSnackbarOpen(true);
-      setSnackbarSeverity('success');
-      handleGetCourse();
-      handleGetDecksByCourseId();
-      handleCloseModal();
-    } catch (error) {
-      setSnackbarMessage(error.message);
-      setSnackbarOpen(true);
-      console.error(error);
-    }
+  const handleUpdateDeckClick = (deck) => {
+    setSelectedDeck(deck);
+    setIsModalOpen(true);
+    setModalSubmitName('Chỉnh sửa bộ thẻ');
+    setIsCreateMode(false);
   };
 
+  // ** DELETE ** //
   const handleDeleteDeck = async (deckId) => {
     try {
       const result = await fetchDeleteDeck(deckId);
@@ -271,11 +258,29 @@ const Decks = () => {
     setIsOpenDeleteModal(false);
   };
 
+  // ** MODAL ** //
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsNameValid(true);
+    setSelectedDeck(null);
+    setIsNameValid(true);
+    setNameError('');
+  };
+
+  // ** REFRESH DATA ** //
   const refreshData = () => {
     handleGetCourse();
     handleGetDecksByCourseId();
   };
 
+  const resetModal = () => {
+    setName('');
+    setDescription('');
+    setImage(DEFAULT_DECK_IMAGE);
+    setPreviewImage(DEFAULT_DECK_IMAGE);
+  };
+
+  // ** USE EFFECT ** //
   React.useEffect(() => {
     if (selectedDeck) {
       setName(selectedDeck.name);
@@ -283,88 +288,99 @@ const Decks = () => {
       setPreviewImage(selectedDeck.image_url);
       setIsPublic(selectedDeck.is_public);
     } else {
-      setName('');
-      setDescription('');
-      setImage(DEFAULT_DECK_IMAGE);
-      setPreviewImage(DEFAULT_DECK_IMAGE);
+      resetModal();
     }
   }, [selectedDeck]);
 
   React.useEffect(() => {
     if (currentPage === 0) {
-      setCurrentPage(1);
+      setCurrentPage(Math.min(currentPage, totalPages));
       return;
     }
 
     refreshData();
   }, [currentPage]);
 
+  const location = useLocation();
+  React.useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const page = searchParams.get('page');
+    setCurrentPage(page ? parseInt(page) : 1);
+  }, [location]);
+
   return (
     <Box>
-      <Breadcrumbs aria-label="breadcrumb">
-        <Link
-          underline="hover"
-          color="inherit"
-          sx={{ cursor: 'pointer' }}
-          onClick={(e) => {
-            e.preventDefault();
-            navigate('/courses');
-          }}
-        >
-          Khóa học
-        </Link>
-        <Typography color="text.primary">Bộ thẻ</Typography>
-      </Breadcrumbs>
-      <Grid container spacing={1}>
-        <Grid item xs={12} sm={4} sx={{ display: { xs: 'none', sm: 'block' } }}>
-          <Card>
-            <CardMedia
-              component="img"
-              image={course.image_url}
-              alt={course.name}
-              sx={{ maxHeight: '200px', objectFit: 'contain' }}
-            />
-          </Card>
+      <Box>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            underline="hover"
+            color="inherit"
+            sx={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/courses');
+            }}
+          >
+            Khóa học
+          </Link>
+          <Typography color="text.primary">Bộ thẻ</Typography>
+        </Breadcrumbs>
+      </Box>
+
+      <Box>
+        <Grid container spacing={1}>
+          <Grid item xs={12} sm={4} sx={{ display: { xs: 'none', sm: 'block' } }}>
+            <Card>
+              <CardMedia
+                component="img"
+                image={course.image_url}
+                alt={course.name}
+                sx={{ maxHeight: '200px', objectFit: 'contain' }}
+              />
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} sm={8}>
+            <Card>
+              <CardContent sx={{ maxHeight: '200px' }}>
+                <Typography gutterBottom variant="h5" component="div">
+                  {course.name}
+                </Typography>
+                <Divider />
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    fontSize: '1rem',
+                    fontWeight: 400,
+                    lineHeight: '1.8rem',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                  }}
+                >
+                  {course.description}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={8}>
-          <Card>
-            <CardContent sx={{ maxHeight: '200px' }}>
-              <Typography gutterBottom variant="h5" component="div">
-                {course.name}
-              </Typography>
-              <Divider />
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                sx={{
-                  fontSize: '1rem',
-                  fontWeight: 400,
-                  lineHeight: '1.8rem',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 3,
-                  WebkitBoxOrient: 'vertical',
-                }}
-              >
-                {course.description}
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      </Box>
 
       <Divider />
       <CustomSnackbar
         open={snackbarOpen}
         severity={snackbarSeverity}
         message={snackbarMessage}
-        onClose={handleSnackbarClose}
+        onClose={() => setSnackbarOpen(false)}
       />
+
       <Box>
         <Modal
           open={isModalOpen}
-          course={selectedDeck}
+          deck={selectedDeck}
           onClose={handleCloseModal}
           //onSave={() => console.log('Save changes')}
           aria-labelledby="modal-modal-title"
@@ -375,7 +391,7 @@ const Decks = () => {
               open={snackbarOpen}
               severity={snackbarSeverity}
               message={snackbarMessage}
-              onClose={handleSnackbarClose}
+              onClose={() => setSnackbarOpen(false)}
             />
             <Typography variant="h6" id="modal-modal-title" sx={{ mt: 2 }}>
               {modalSubmitName}
@@ -434,6 +450,7 @@ const Decks = () => {
             </form>
           </Box>
         </Modal>
+
         <DeleteConfirmModal
           open={isOpenDeleteModal}
           onClose={() => setIsOpenDeleteModal(false)}
@@ -449,12 +466,14 @@ const Decks = () => {
         <Button variant="contained" sx={{ margin: '8px' }} onClick={() => handleCreateDeckClick()}>
           Tạo bộ thẻ
         </Button>
+        <Typography variant="h4">Số lượng bộ thẻ: {totalDecks}</Typography>
         <DeckItems
           decks={decks}
           onUpdateDeckClick={(deck) => handleUpdateDeckClick(deck)}
           onDeleteDeckClick={(deckId) => handleDeleteDeckClick(deckId)}
         ></DeckItems>
       </Box>
+
       <Pagination
         count={totalPages}
         page={currentPage}

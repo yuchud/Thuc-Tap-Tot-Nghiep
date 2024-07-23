@@ -1,0 +1,21 @@
+.course-image {
+    transition: transform 0.3s ease; /* Smooth transition for the transform property */
+    height: 17rem;
+  }
+  
+  .course-image:hover {
+    transform: scale(0.99); /* Slightly increase the size */
+    /* For movement, you could use translate, e.g., 'transform: translateX(10px);' */
+  }
+
+  .pro-badge {
+    background-color: #f50057; /* Example color */
+    color: white;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 8px;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 1;
+  }

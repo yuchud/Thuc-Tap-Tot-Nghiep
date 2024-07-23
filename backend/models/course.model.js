@@ -27,11 +27,6 @@ class CoursesModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: 0,
         },
-        deck_limit: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-          defaultValue: 10,
-        },
         is_public: {
           type: DataTypes.BOOLEAN,
           allowNull: false,

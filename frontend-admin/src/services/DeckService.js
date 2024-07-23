@@ -76,6 +76,12 @@ export const fetchDeleteDeck = async (courseId) => {
     const response = await fetch(`${BASE_API_URL}/decks/${courseId}`, {
       method: 'DELETE',
     });
+    if (!response.ok) {
+      if (response.status === http.BAD_REQUEST) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    }
     return response.json();
   } catch (error) {
     return { error: error.message };

@@ -24,6 +24,7 @@ import '../../../assets/css/courseCard.css';
 import Divider from '@mui/material/Divider';
 import CourseTags from './CourseTags';
 import { useNavigate } from 'react-router';
+import Stack from '@mui/material/Stack';
 
 const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
   const CardActionsStyled = styled(CardActions)({
@@ -80,7 +81,9 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
             {renderCardDescription(course.description)}
           </Typography>
           <Divider />
-          <CourseTags is_public={course.is_public} is_need_pro={course.is_need_pro} />
+          <Stack sx={{ mt: 1 }}>
+            <CourseTags is_public={course.is_public} is_need_pro={course.is_need_pro} />
+          </Stack>
         </CardContent>
 
         <CardActionsStyled>

@@ -5,10 +5,12 @@ const azureStorage = require('../utils/azure-storage.util');
 const { DEFAULT_DECK_IMAGE } = require('../config/app.config');
 
 const deckService = {
-  getAllDecks: async (page = 1, limit = 12) => {
+  getAllDecks: async (page = 1, limit = 12, is_public = null) => {
     try {
       const offset = (page - 1) * limit;
+      const whereClause = is_public === null ? {} : { is_public: is_public };
       const { count, rows } = await deckModel.findAndCountAll({
+        where: whereClause,
         limit: limit,
         offset: offset,
       });
@@ -162,13 +164,20 @@ const deckService = {
       return error;
     }
   },
-  getDecksByCourseId: async (courseId, page = 1, limit = 12) => {
+  getDecksByCourseId: async (
+    courseId,
+    page = 1,
+    limit = 12,
+    is_public = null
+  ) => {
     try {
       const offset = (page - 1) * limit;
+      const whereClause =
+        is_public === null
+          ? { course_id: courseId }
+          : { course_id: courseId, is_public: is_public };
       const { count, rows } = await deckModel.findAndCountAll({
-        where: {
-          course_id: courseId,
-        },
+        where: whereClause,
         limit: limit,
         offset: offset,
       });

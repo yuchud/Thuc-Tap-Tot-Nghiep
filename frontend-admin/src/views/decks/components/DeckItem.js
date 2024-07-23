@@ -24,6 +24,7 @@ import '../../../assets/css/courseCard.css';
 import Divider from '@mui/material/Divider';
 import DeckTags from '../../courses/components/CourseTags';
 import { useNavigate } from 'react-router';
+import Stack from '@mui/material/Stack';
 
 const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
   const CardActionsStyled = styled(CardActions)({
@@ -43,7 +44,7 @@ const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
   const navigate = useNavigate();
 
   const openDeck = (deckId) => {
-    navigate(`/decks/${deckId}/decks`);
+    navigate(`/courses/${deck.course_id}/decks/${deckId}/cards`);
   };
 
   const renderCardDescription = (description) => {
@@ -80,7 +81,9 @@ const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
             {renderCardDescription(deck.description)}
           </Typography>
           <Divider />
-          <DeckTags is_public={deck.is_public} />
+          <Stack sx={{ mt: 1 }}>
+            <DeckTags is_public={deck.is_public} />
+          </Stack>
         </CardContent>
 
         <CardActionsStyled>

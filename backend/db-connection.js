@@ -18,6 +18,8 @@ const models = {
   DeckModel: require('./models/deck.model').init(sequelize),
   ProPlanModel: require('./models/pro-plan.model').init(sequelize),
   CourseModel: require('./models/course.model').init(sequelize),
+  CardModel: require('./models/card.model').init(sequelize),
+  WordClassModel: require('./models/word-class.model').init(sequelize),
 };
 
 Object.values(models)

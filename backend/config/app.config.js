@@ -10,4 +10,6 @@ module.exports = {
     'https://yuchudblob.blob.core.windows.net/images/courses/default/1.png',
   DEFAULT_DECK_IMAGE:
     'https://yuchudblob.blob.core.windows.net/images/decks/default/deck.png',
+  DEFAULT_CARD_FRONT_IMAGE:
+    'https://yuchudblob.blob.core.windows.net/images/cards/front/default/flashcard.png',
 };

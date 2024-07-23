@@ -4,8 +4,7 @@ import SidebarItems from './SidebarItems';
 import { Upgrade } from './Updrade';
 
 const Sidebar = (props) => {
-
-  const lgUp = useMediaQuery((theme) => theme.breakpoints.up("lg"));
+  const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
 
   const sidebarWidth = '270px';
 
@@ -50,9 +49,8 @@ const Sidebar = (props) => {
               {/* Sidebar Items */}
               {/* ------------------------------------------- */}
               <SidebarItems />
-              <Upgrade />
+              {/* <Upgrade /> */}
             </Box>
-            
           </Box>
         </Drawer>
       </Box>

@@ -4,7 +4,7 @@ const objectName = require('../utils/props-and-objects.util').OBJECTS.COURSE;
 const actionCreate = require('../utils/props-and-objects.util').ACTIONS.CREATE;
 const actionUpdate = require('../utils/props-and-objects.util').ACTIONS.UPDATE;
 const actionDelete = require('../utils/props-and-objects.util').ACTIONS.DELETE;
-const nameProp = require('../utils/props-and-objects.util').PROS.NAME;
+const nameProp = require('../utils/props-and-objects.util').PROPS.NAME;
 const DECK = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const requestMessageUtil = require('../utils/requestMessage.util');
 
@@ -13,6 +13,19 @@ const courseController = {
     try {
       const { page, limit } = req.query;
       const courses = await courseService.getAllCourses(+page, +limit);
+      res.status(http.StatusCodes.OK).json(courses);
+    } catch (error) {
+      console.log(error);
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+  getAllPublicCourses: async (req, res) => {
+    try {
+      const { page, limit } = req.query;
+      const courses = await courseService.getAllCourses(+page, +limit, true);
+      console.log(courses);
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {
       console.log(error);

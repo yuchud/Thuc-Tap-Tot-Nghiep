@@ -35,9 +35,11 @@ const Courses = () => {
   const [selectedCourse, setSelectedCourse] = React.useState({});
   const [courseUpdated, setCourseUpdated] = React.useState(false);
   const [deletedCourseId, setDeletedCourseId] = React.useState(null);
+
   const [currentPage, setCurrentPage] = React.useState(0);
   const [coursesPerPage] = React.useState(12);
   const [totalPages, setTotalPages] = React.useState(0);
+  const [totalCourses, setTotalCourses] = React.useState(0);
 
   const [image, setImage] = React.useState(null);
   const [name, setName] = React.useState('');
@@ -65,6 +67,7 @@ const Courses = () => {
     if (fetchedCourses) {
       setCourses(fetchedCourses.courses);
       setTotalPages(fetchedCourses.totalPages);
+      setTotalCourses(fetchedCourses.total);
       if (currentPage > fetchedCourses.totalPages) {
         setCurrentPage(fetchedCourses.totalPages);
         return;
@@ -243,27 +246,19 @@ const Courses = () => {
       setIsNeedPro(false);
     }
   }, [selectedCourse]);
-
   React.useEffect(() => {
-    //console.log(currentPage);
     if (currentPage === 0) {
-      setCurrentPage(1);
+      setCurrentPage(Math.min(currentPage, totalPages));
       return;
     }
-
     fetchCourses();
-    //console.log(currentPage);
   }, [currentPage]);
 
   const location = useLocation();
   React.useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-
     const page = searchParams.get('page');
-    //console.log(page);
     setCurrentPage(page ? parseInt(page) : 1);
-    //fetchCourses(page);
-    //console.log(2);
   }, [location]);
 
   return (
@@ -374,6 +369,7 @@ const Courses = () => {
         >
           Tạo khóa học
         </Button>
+        <Typography variant="h4">Số lượng khóa học: {totalCourses}</Typography>
         <CourseItems
           courses={courses}
           onUpdateCourseClick={(course) => handleUpdateCourseClick(course)}

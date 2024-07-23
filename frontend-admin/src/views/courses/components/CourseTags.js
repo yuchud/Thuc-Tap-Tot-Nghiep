@@ -3,7 +3,7 @@ import FaceIcon from '@mui/icons-material/Face';
 
 const CourseTags = ({ is_public, is_need_pro = null }) => {
   return (
-    <Box sx={{ mt: 1 }}>
+    <Box>
       {is_public && (
         <Chip
           label="Công khai"

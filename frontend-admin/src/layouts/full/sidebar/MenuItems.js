@@ -41,23 +41,13 @@ const Menuitems = [
   },
   {
     navlabel: true,
-    subheader: 'Course Management',
+    subheader: 'Management',
   },
   {
     id: uniqueId(),
     title: 'Courses',
     icon: IconCertificate,
     href: '/courses',
-  },
-  {
-    id: uniqueId(),
-    title: 'Desks',
-    icon: IconCertificate,
-    href: '/desks/course-id/:id',
-  },
-  {
-    navlabel: true,
-    subheader: 'User Management',
   },
   {
     id: uniqueId(),

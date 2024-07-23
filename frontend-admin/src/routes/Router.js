@@ -21,7 +21,8 @@ const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Register = Loadable(lazy(() => import('../views/authentication/Register')));
 const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const Users = Loadable(lazy(() => import('../views/users/Users.js')));
-
+const Cards = Loadable(lazy(() => import('../views/cards/Cards.js')));
+const Customers = Loadable(lazy(() => import('../views/customers/Customers.js')));
 const Router = [
   {
     path: '/',
@@ -29,8 +30,10 @@ const Router = [
     children: [
       { path: '/', element: <Navigate to="/dashboard" /> },
       { path: '/dashboard', exact: true, element: <Dashboard /> },
+      { path: '/courses/:courseId/decks/:deckId/cards', exact: true, element: <Cards /> },
       { path: '/courses/:courseId/decks', exact: true, element: <Decks /> },
       { path: '/courses', exact: true, element: <Courses /> },
+      { path: '/customers', exact: true, element: <Customers /> },
 
       // { path: 'desks', exact: true, element: <Decks /> },
       { path: '/users', exact: true, element: <Users /> },

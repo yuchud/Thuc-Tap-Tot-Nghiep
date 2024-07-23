@@ -1,11 +1,14 @@
 const deckService = require('../services/deck.service');
+const cardService = require('../services/card.service');
 const http = require('http-status-codes');
 const objectName = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const actionCreate = require('../utils/props-and-objects.util').ACTIONS.CREATE;
 const actionUpdate = require('../utils/props-and-objects.util').ACTIONS.UPDATE;
 const actionDelete = require('../utils/props-and-objects.util').ACTIONS.DELETE;
-const nameProp = require('../utils/props-and-objects.util').PROS.NAME;
+const nameProp = require('../utils/props-and-objects.util').PROPS.NAME;
 const requestMessageUtil = require('../utils/requestMessage.util');
+const { getAllCards } = require('../services/card.service');
+const CARD = require('../utils/props-and-objects.util').OBJECTS.CARD;
 
 const deckController = {
   getAllDecks: async (req, res) => {
@@ -44,6 +47,25 @@ const deckController = {
     try {
       const { page, limit } = req.query;
       const decks = await deckService.getDecksByCourseId(id, +page, +limit);
+      res.status(http.StatusCodes.OK).json(decks);
+    } catch (error) {
+      console.log(error);
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+
+  getPublicDecksByCourseId: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const { page, limit } = req.query;
+      const decks = await deckService.getDecksByCourseId(
+        id,
+        +page,
+        +limit,
+        true
+      );
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
@@ -132,8 +154,22 @@ const deckController = {
   deleteDeck: async (req, res) => {
     const { id } = req.params;
     try {
-      const deleteDeck = await deckService.deleteDeck(id);
+      const deck = await deckService.getDeckById(id);
+      if (!deck) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(objectName),
+        });
+      }
+      if (deck.card_count > 0) {
+        return res.status(http.StatusCodes.BAD_REQUEST).json({
+          message: requestMessageUtil.cannotDeleteObjectWithChild(
+            objectName,
+            CARD
+          ),
+        });
+      }
 
+      const deleteDeck = await deckService.deleteDeck(id);
       if (!deleteDeck) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),
@@ -145,6 +181,29 @@ const deckController = {
           objectName
         ),
       });
+    } catch (error) {
+      console.log(error);
+      res
+        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ error: error.message });
+    }
+  },
+  getCardsByDeckId: async (req, res) => {
+    const { id } = req.params;
+    try {
+      const deck = await deckService.getDeckById(id);
+      if (!deck) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(objectName),
+        });
+      }
+      const cards = await cardService.getCardsByDeckId(id);
+      if (!cards) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({
+          message: requestMessageUtil.notFoundObject(CARD),
+        });
+      }
+      res.status(http.StatusCodes.OK).json(cards);
     } catch (error) {
       console.log(error);
       res

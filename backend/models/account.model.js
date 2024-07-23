@@ -9,6 +9,10 @@ class AccountsModel extends Sequelize.Model {
           primaryKey: true,
           autoIncrement: true,
         },
+        avatar_url: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
         username: {
           type: DataTypes.STRING,
           allowNull: false,
@@ -18,9 +22,6 @@ class AccountsModel extends Sequelize.Model {
           type: DataTypes.STRING,
           allowNull: true,
           unique: true,
-          validate: {
-            isEmail: true,
-          },
         },
         password: {
           type: DataTypes.STRING,
@@ -37,6 +38,16 @@ class AccountsModel extends Sequelize.Model {
         birthday: {
           type: DataTypes.DATE,
           allowNull: true,
+        },
+        is_banned: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        is_pro: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
         },
         created_at: {
           type: DataTypes.DATE,
