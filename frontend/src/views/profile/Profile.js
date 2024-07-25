@@ -33,6 +33,7 @@ const Profile = () => {
     console.log('fadff', profile);
     setProfile(fetchedProfile);
   };
+
   const handleAvatarChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setAvatar(e.target.files[0]);
@@ -56,9 +57,9 @@ const Profile = () => {
     if (!IsFormValid()) {
       return;
     }
+    // console.log(avatar, username, email, firstName, lastName, birthday);
 
     const formData = new FormData();
-    console.log(avatar, username, email, firstName, lastName, birthday);
     formData.append('file', avatar);
     formData.append('username', username);
     formData.append('email', email);

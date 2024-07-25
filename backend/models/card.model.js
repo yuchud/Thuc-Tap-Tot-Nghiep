@@ -17,6 +17,15 @@ class CardModel extends Sequelize.Model {
           type: DataTypes.STRING,
           allowNull: true,
         },
+        front_pronunciation: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+        front_audio_url: {
+          type: DataTypes.STRING,
+          allowNull: true,
+        },
+
         back_text: {
           type: DataTypes.STRING,
           allowNull: false,

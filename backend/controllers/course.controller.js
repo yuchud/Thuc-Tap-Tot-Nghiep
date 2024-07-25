@@ -8,6 +8,7 @@ const nameProp = require('../utils/props-and-objects.util').PROPS.NAME;
 const DECK = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const requestMessageUtil = require('../utils/requestMessage.util');
 
+
 const courseController = {
   getAllCourses: async (req, res) => {
     try {
@@ -16,22 +17,18 @@ const courseController = {
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   getAllPublicCourses: async (req, res) => {
     try {
-      const { page, limit } = req.query;
-      const courses = await courseService.getAllCourses(+page, +limit, true);
+      const { page, limit, account_id } = req.query;
+      const courses = await courseService.getAllCourses(+page, +limit, true, account_id);
       console.log(courses);
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   getCourseById: async (req, res) => {
@@ -46,13 +43,12 @@ const courseController = {
       res.status(http.StatusCodes.OK).json(course);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   createCourse: async (req, res) => {
-    const { name, description } = req.body;
+    const { name, description, list } = req.body;
+    console.log(req.body);
     const image = req.file;
     try {
       if (!name.trim()) {
@@ -74,16 +70,11 @@ const courseController = {
         image,
       });
       res.status(http.StatusCodes.CREATED).json({
-        message: requestMessageUtil.successActionObject(
-          actionCreate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionCreate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   updateCourse: async (req, res) => {
@@ -110,16 +101,11 @@ const courseController = {
         is_need_pro,
       });
       res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionUpdate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionUpdate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -133,13 +119,9 @@ const courseController = {
         });
       }
       if (course.deck_count > 0) {
-        console.log(
-          requestMessageUtil.cannotDeleteObjectWithChild(objectName, [DECK])
-        );
+        console.log(requestMessageUtil.cannotDeleteObjectWithChild(objectName, [DECK]));
         return res.status(http.StatusCodes.BAD_REQUEST).json({
-          message: requestMessageUtil.cannotDeleteObjectWithChild(objectName, [
-            DECK,
-          ]),
+          message: requestMessageUtil.cannotDeleteObjectWithChild(objectName, [DECK]),
         });
       }
       const deletedCourse = await courseService.deleteCourse(id);
@@ -150,15 +132,10 @@ const courseController = {
       }
 
       res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionDelete,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionDelete, objectName),
       });
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 };

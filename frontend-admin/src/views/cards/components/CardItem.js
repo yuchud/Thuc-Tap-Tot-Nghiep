@@ -65,10 +65,13 @@ const CardItem = ({ card, wordClasses, onUpdateCardClick, onDeleteCardClick }) =
   return (
     <Box>
       <Card sx={{ maxWidth: 345 }}>
-        <CardMedia image={card.front_image} className="course-image" title="green iguana" />
+        <CardMedia image={card.front_image} className="course-image" title={card.front_text} />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">
             {card.front_text}
+          </Typography>
+          <Typography gutterBottom variant="h6" component="div">
+            {card.front_pronunciation}
           </Typography>
           <Typography
             variant="body1"

@@ -144,7 +144,6 @@ const Courses = () => {
     formData.append('name', newName);
     formData.append('description', newDescription);
     formData.append('file', image);
-
     try {
       const result = await fetchCreateCourse(formData);
       if (result.hasOwnProperty('error')) {

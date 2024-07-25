@@ -1,5 +1,6 @@
 const CardModel = require('../models/card.model');
 const DeckModel = require('../models/deck.model');
+const CourseModel = require('../models/course.model');
 const sequelize = require('../db-connection');
 const azureStorage = require('../utils/azure-storage.util');
 const appConfig = require('../config/app.config');
@@ -19,42 +20,26 @@ const CardService = {
       throw error;
     }
   },
-  createCard: async (
-    front_text,
-    front_image,
-    back_text,
-    deck_id,
-    word_class_id
-  ) => {
+  createCard: async (cardData, front_image) => {
     try {
       let card = null;
       await sequelize.transaction(async (t) => {
         let imageUrl = null;
         if (front_image) {
           imageUrl = await azureStorage.uploadImage(
-            (containerName = 'cards/front'), // Azure container name
+            'cards/front', // Azure container name
             front_image // Construct a unique path for the image
           );
         }
         if (imageUrl === null) {
           imageUrl = appConfig.DEFAULT_CARD_FRONT_IMAGE;
         }
-
-        card = await CardModel.create(
-          {
-            front_text,
-            front_image: imageUrl,
-            back_text,
-            deck_id,
-            word_class_id,
-          },
-          { transaction: t }
-        );
-        DeckModel.increment(
-          'card_count',
-          { where: { id: deck_id } },
-          { transaction: t }
-        );
+        cardData.front_image = imageUrl;
+        console.log(cardData);
+        card = await CardModel.create(cardData, { transaction: t });
+        const deck = await DeckModel.findByPk(cardData.deck_id, { transaction: t });
+        deck.increment('card_count', { by: 1 }, { transaction: t });
+        CourseModel.increment('card_count', { by: 1, where: { id: deck.course_id } }, { transaction: t });
       });
 
       return card;
@@ -62,15 +47,7 @@ const CardService = {
       throw error;
     }
   },
-  updateCard: async (
-    id,
-    front_text,
-    front_image,
-    back_text,
-    deck_id,
-    is_public,
-    word_class_id
-  ) => {
+  updateCard: async (id, front_text, front_image, back_text, deck_id, is_public, word_class_id) => {
     try {
       let updatedCard = null;
       const card = await CardModel.findByPk(id);
@@ -130,14 +107,9 @@ const CardService = {
           },
           { transaction: t }
         );
-
-        DeckModel.decrement(
-          'card_count',
-          {
-            where: { id: card.deck_id },
-          },
-          { transaction: t }
-        );
+        const deck = await DeckModel.findByPk(card.deck_id, { transaction: t });
+        deck.decrement('card_count', { by: 1 }, { transaction: t });
+        CourseModel.decrement('card_count', { by: 1, where: { id: deck.course_id } }, { transaction: t });
       });
       console.log(deletedCard);
       return deletedCard;
@@ -147,9 +119,7 @@ const CardService = {
   },
   getCardsByDeckId: async (deckId, is_public = null) => {
     try {
-      const whereClause = is_public
-        ? { deck_id: deckId, is_public }
-        : { deck_id: deckId };
+      const whereClause = is_public ? { deck_id: deckId, is_public } : { deck_id: deckId };
       return await CardModel.findAll({
         where: whereClause,
       });

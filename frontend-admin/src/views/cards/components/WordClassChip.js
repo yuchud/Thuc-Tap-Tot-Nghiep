@@ -2,7 +2,6 @@ import React from 'react';
 
 import Chip from '@mui/material/Chip';
 const WordClassChip = ({ wordClass }) => {
-  console.log(wordClass);
   let color = null;
   const label = wordClass.name;
   switch (wordClass.id) {

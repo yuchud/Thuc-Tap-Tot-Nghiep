@@ -1,10 +1,10 @@
 const { DEFAULT_COURSE_IMAGE } = require('../config/app.config');
 const courseModel = require('../models/course.model');
 const azureStorage = require('../utils/azure-storage.util');
-const fs = require('fs');
+const accountCourseDetailModel = require('../models/account-course-detail.model');
 
 const courseService = {
-  getAllCourses: async (page = 1, limit = 10, isPublic = null) => {
+  getAllCourses: async (page = 1, limit = 10, isPublic = null, accountId = null) => {
     try {
       const offset = (page - 1) * limit;
       const whereClause = {};
@@ -16,6 +16,22 @@ const courseService = {
         limit: limit,
         offset: offset,
       });
+      if (accountId) {
+        const courseWithProgress = await Promise.all(
+          rows.map(async (course) => {
+            const accountCourseDetail = await accountCourseDetailModel.findOne({
+              where: {
+                account_id: accountId,
+                course_id: course.id,
+              },
+            });
+            course.dataValues.learned_deck_count = accountCourseDetail ? accountCourseDetail.learned_deck_count : 0;
+            course.dataValues.get
+            return course;
+          })
+        );
+      }
+      // console.log(rows);
       return {
         total: count,
         courses: rows,
@@ -92,10 +108,7 @@ const courseService = {
     }
   },
 
-  updateCourse: async (
-    courseId,
-    { name, description, image, is_public, is_need_pro }
-  ) => {
+  updateCourse: async (courseId, { name, description, image, is_public, is_need_pro }) => {
     try {
       const course = await courseModel.findByPk(courseId);
       if (!course) {

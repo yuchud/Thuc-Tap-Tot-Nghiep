@@ -25,16 +25,10 @@ const CardController = {
   },
   createCard: async (req, res) => {
     try {
-      const { front_text, back_text, deck_id, word_class_id } = req.body;
+      const cardData = req.body;
+      console.log(cardData);
       const front_image = req.file;
-      console.log(front_image);
-      const card = await cardService.createCard(
-        front_text,
-        front_image,
-        back_text,
-        deck_id,
-        word_class_id
-      );
+      const card = await cardService.createCard(cardData, front_image);
 
       res.status(http.StatusCodes.CREATED).json({
         message: requestMessageUtil.successActionObject(

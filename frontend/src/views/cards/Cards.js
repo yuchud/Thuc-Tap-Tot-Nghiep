@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Card, CardContent, CardMedia, Divider, Grid, Typography } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { fetchGetCardsByDeckId } from '../../services/CardService';
 import { fetchGetDeckById } from '../../services/DeskService';
 import CardItems from './component/CardItems';
 
+import { Button } from '@mui/material';
 const Cards = () => {
   const deckId = useParams().deckId;
   const [deck, setDeck] = React.useState({});
@@ -27,6 +28,7 @@ const Cards = () => {
     }
   };
 
+  const navigate = useNavigate();
   React.useEffect(() => {
     fetchGetDeck();
     fetchGetCards();
@@ -75,7 +77,14 @@ const Cards = () => {
         </Grid>
       </Box>
       <Box>
-        <Typography variant="h1">Cards</Typography>
+        <Typography variant="h1">Thẻ</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate(`/courses/${deck.course_id}/decks/${deckId}/learning`)}
+        >
+          Study
+        </Button>
         <CardItems cards={cards}></CardItems>
       </Box>
     </Box>

@@ -21,7 +21,9 @@ const Decks = Loadable(lazy(() => import('../views/decks/Decks')));
 const Cards = Loadable(lazy(() => import('../views/cards/Cards')));
 const Profile = Loadable(lazy(() => import('../views/profile/Profile')));
 const Password = Loadable(lazy(() => import('../views/profile/Password')));
-const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans.js')));
+const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans')));
+const Flashcards = Loadable(lazy(() => import('../views/flashcard/Flashcards')));
+const Learnings = Loadable(lazy(() => import('../views/learning/Learning')));
 const Router = [
   {
     path: '/',
@@ -51,9 +53,12 @@ const Router = [
       // { path: '/courses', element: <Courses /> },
       { path: '/courses/:courseId/decks', element: <Decks /> },
       { path: '/courses/:courseId/decks/:deckId/cards', element: <Cards /> },
+      { path: '/courses/:courseId/decks/:deckId/learning', element: <Learnings /> },
       { path: '/pro-plans', element: <ProPlans /> },
       { path: '/about', element: <About /> },
       { path: '/password', element: <Password /> },
+      { path: '/flashcards', element: <Flashcards /> },
+
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
