@@ -222,6 +222,12 @@ const Cards = () => {
 
   // ** CREATE ** //
   const handleCreateCardClick = () => {
+    if (deck.card_count >= deck.card_limit) {
+      setSnackbarMessage('Số lượng thẻ đã đạt giới hạn');
+      setSnackbarSeverity('error');
+      setIsSnackbarOpen(true);
+      return;
+    }
     setIsModalOpen(true);
     resetModal();
     setModalSubmitName('Tạo thẻ');
@@ -402,6 +408,7 @@ const Cards = () => {
       setFrontText(selectedCard.front_text);
       setBackText(selectedCard.back_text);
       setWordClass(`${selectedCard.word_class_id}`);
+      setImage(selectedCard.front_image);
       setPreviewImage(selectedCard.front_image);
       setIsPublic(selectedCard.is_public);
       setFrontAudioUrl(selectedCard.front_audio_url);
@@ -728,6 +735,9 @@ const Cards = () => {
           {/* <Typography variant="h5">
           Số lượng bộ thẻ: {course.deck_count}/{course.deck_limit}
         </Typography> */}
+          <Typography variant="h4" sx={{ mt: 2 }}>
+            Số lượng thẻ: {deck.card_count} / {deck.card_limit}
+          </Typography>
           <Button
             variant="contained"
             sx={{ margin: '8px' }}

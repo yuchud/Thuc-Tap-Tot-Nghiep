@@ -76,14 +76,17 @@ const Cards = () => {
           </Grid>
         </Grid>
       </Box>
-      <Box>
-        <Typography variant="h1">Thẻ</Typography>
+      <Box style={{ 'text-align': 'center' }}>
+        <Typography variant="h1">
+          Đã học {deck.learned_card_count} / {deck.card_count} thẻ
+        </Typography>
         <Button
           variant="contained"
           color="primary"
           onClick={() => navigate(`/courses/${deck.course_id}/decks/${deckId}/learning`)}
+          sx={{ margin: '10px' }}
         >
-          Study
+          học ngay
         </Button>
         <CardItems cards={cards}></CardItems>
       </Box>

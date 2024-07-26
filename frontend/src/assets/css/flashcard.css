@@ -2,7 +2,7 @@
   perspective: 1000px;
   max-width: 60%; /* Match the max-width of the Card component */
   min-width: 0%;
-  height: 400px/* Specify a fixed height that accommodates the card's content */;
+  height: 420px/* Specify a fixed height that accommodates the card's content */;
   margin: auto; /* Center the card if needed */
   text-align: center;
 }
@@ -44,7 +44,7 @@
   line-height: 2.25rem; 
 }
 
-.next-card-indicator {
+.known-indicator {
   position: absolute;
   right: 0px; 
   bottom: -50px;
@@ -55,6 +55,22 @@
   cursor: pointer;
 }
 
-.next-card-indicator:hover {
+.known-indicator:hover {
   background-color: #0056b3; 
+}
+
+
+.not-known-indicator {
+  position: absolute;
+  left: 0px; 
+  bottom: -50px;
+  background-color: red; 
+  color: white; 
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.not-known-indicator:hover {
+  background-color: #dc3545; 
 }

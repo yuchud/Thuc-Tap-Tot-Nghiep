@@ -1,9 +1,10 @@
 import { BASE_API_URL } from 'src/constants/api';
+import { GetCurrentAccountId } from './AuthService';
 
 export const fetchGetDecksByCourseId = async (courseId, page = 1, limit = 12) => {
   try {
     const response = await fetch(
-      `${BASE_API_URL}/courses/${courseId}/decks/public?page=${page}&limit=${limit}`,
+      `${BASE_API_URL}/courses/${courseId}/decks/public?page=${page}&limit=${limit}&account_id=${GetCurrentAccountId()}`,
       {
         method: 'GET',
       },
@@ -17,7 +18,8 @@ export const fetchGetDecksByCourseId = async (courseId, page = 1, limit = 12) =>
 
 export const fetchGetDeckById = async (deckId) => {
   try {
-    const response = await fetch(`${BASE_API_URL}/decks/${deckId}`, {
+    const accountId = GetCurrentAccountId();
+    const response = await fetch(`${BASE_API_URL}/decks/${deckId}?account_id=${accountId}`, {
       method: 'GET',
     });
     return response.json();

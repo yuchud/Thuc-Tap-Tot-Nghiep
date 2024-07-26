@@ -5,19 +5,112 @@ require('dotenv').config();
 const sequelize = require('../db-connection');
 
 const DeckModel = require('../models/deck.model');
-const DateService = require('./date.service');
+const DateService = require('../utils/date.util');
+const CardModel = require('../models/card.model');
+const WordClassModel = require('../models/word-class.model');
 
 const learningService = {
+  getCardsToStudyInDeck: async (accountID, deckID, limit = 2) => {
+    // 1.get all cards in a deck
+    const cards = await CardModel.findAll({
+      where: { deck_id: deckID },
+    });
+
+    // console.log('cards', cards);
+    //2. get learned cards in a deck
+    const accountCardDetail = await AccountCardDetailModel.findAll({
+      where: {
+        account_id: accountID,
+        card_id: cards.map((card) => card.id),
+      },
+    });
+    // console.log('accountCardDetail', accountCardDetail);
+    // 3. join 1 and 2 to get cards to study in a deck
+    let cardsToStudy = cards.map((card) => {
+      const cardsWithPerformance = accountCardDetail.find((detail) => detail.card_id === card.id);
+      return {
+        ...card.toJSON(),
+        performance: cardsWithPerformance ? cardsWithPerformance.performance : 0,
+      };
+    });
+    // console.log('cardsToStudy', cardsToStudy);
+    // 4. sort cards to study by performance
+    cardsToStudy.sort((a, b) => a.performance - b.performance);
+
+    // console.log('cardsToStudy', cardsToStudy.slice(0, limit));
+    // 5. get the first limit cards
+    cardsToStudy = cardsToStudy.slice(0, limit);
+    //console.log('cardsToStudy', cardsToStudy);
+    // 6. get all word classes
+    const wordClasses = await WordClassModel.findAll();
+
+    // 7. join 5 and 6 to get cards to study with word classes name
+    return cardsToStudy.map((card) => {
+      const wordClass = wordClasses.find((wordClass) => wordClass.id === card.word_class_id);
+      return {
+        ...card,
+        word_class_name: wordClass ? wordClass.name : '',
+        performance: 0,
+        learned_count: 0,
+      };
+    });
+  },
+  getCardsToStudyInCourse: async (accountID, courseID, limit = 12) => {
+    // 1.get all cards in a course
+    const decks = await DeckModel.findAll({
+      where: { course_id: courseID },
+    });
+    const deckIDs = decks.map((deck) => deck.id);
+    const cards = await CardModel.findAll({
+      where: { deck_id: deckIDs },
+    });
+
+    //2. get learned cards in a course
+    const accountCardDetail = await AccountCardDetailModel.findAll({
+      where: {
+        account_id: accountID,
+        card_id: cards.map((card) => card.id),
+      },
+    });
+    // 3. join 1 and 2 to get cards to study in a course
+    const cardsToStudy = cards.map((card) => {
+      const cardsWithPerformance = accountCardDetail.find((detail) => detail.card_id === card.id);
+      return {
+        ...card.toJSON(),
+        performance: cardsWithPerformance ? cardsWithPerformance.performance : 0,
+      };
+    });
+    // 4. sort cards to study by performance
+    cardsToStudy.sort((a, b) => a.performance - b.performance);
+
+    // 5. get the first limit cards
+    cardsToStudy.slice(0, limit);
+
+    // 6. get all word classes
+    const wordClasses = await WordClassModel.findAll();
+    // console.log('wordClasses', wordClasses);
+    // 7. join 5 and 6 to get cards to study with word classes name
+    return cardsToStudy.map((card) => {
+      const wordClass = wordClasses.find((wordClass) => wordClass.id === card.word_class_id);
+      console.log('wordClass', wordClass);
+      return {
+        ...card,
+        word_class_name: wordClass ? wordClass.name : '',
+        performance: 0,
+        learned_count: 0,
+      };
+    });
+  },
   finishLearning: async (accountID, studiedCards) => {
     if (studiedCards.length === 0) {
       return false;
     }
-    process.env.TZ = 'Asia/Ho_Chi_Minh';
+    // process.env.TZ = 'Asia/Ho_Chi_Minh';
     const currentDateTime = DateService.getCurrentDateTime();
-    console.log('currentDateTime', currentDateTime);
+    // console.log('currentDateTime', currentDateTime);
     const transaction = await sequelize.transaction();
     try {
-      let leanredDecksList = [];
+      let learnedDecksList = [];
       let learnedCoursesList = [];
 
       // insert learned cards to account_card_details table
@@ -29,6 +122,7 @@ const learningService = {
           },
         });
         const isCardStudied = accountCardDetail !== null;
+        console.log('studiedCard', studiedCard);
         //console.log('isCardStudied', isCardStudied);
         if (isCardStudied === false) {
           await AccountCardDetailModel.create(
@@ -36,6 +130,7 @@ const learningService = {
               account_id: accountID,
               card_id: studiedCard.id,
               last_reviewed_at: currentDateTime,
+              performance: studiedCard.performance,
             },
             { transaction }
           );
@@ -43,6 +138,7 @@ const learningService = {
           await AccountCardDetailModel.update(
             {
               last_reviewed_at: currentDateTime,
+              performance: accountCardDetail.performance + studiedCard.performance,
             },
             {
               where: {
@@ -53,26 +149,26 @@ const learningService = {
             }
           );
         }
-        let currentStudiedDeckIDsIndex = leanredDecksList.findIndex((deck) => deck.id === studiedCard.deck_id);
+        let currentStudiedDeckIDsIndex = learnedDecksList.findIndex((deck) => deck.id === studiedCard.deck_id);
         if (currentStudiedDeckIDsIndex === -1) {
-          leanredDecksList.push({
+          learnedDecksList.push({
             id: studiedCard.deck_id,
             learnedCardCount: 0,
           });
-          currentStudiedDeckIDsIndex = leanredDecksList.length - 1;
+          currentStudiedDeckIDsIndex = learnedDecksList.length - 1;
         }
         if (isCardStudied === false) {
-          // leanredDecksList[currentStudiedDeckIDsIndex].learnedCardCount += 1;
-          leanredDecksList[currentStudiedDeckIDsIndex].learnedCardCount += 1;
+          // learnedDecksList[currentStudiedDeckIDsIndex].learnedCardCount += 1;
+          learnedDecksList[currentStudiedDeckIDsIndex].learnedCardCount += 1;
         }
       }
 
-      // console.log('leanredDecksList', leanredDecksList);
+      // console.log('learnedDecksList', learnedDecksList);
       // ** create or update learn_deck_count in account_deck_details table
-      for (const leanredDeck of leanredDecksList) {
-        // console.log('leanredDeck', leanredDeck);
-        const deckId = leanredDeck.id;
-        const learnedCardCount = leanredDeck.learnedCardCount;
+      for (const learnedDeck of learnedDecksList) {
+        // console.log('learnedDeck', learnedDeck);
+        const deckId = learnedDeck.id;
+        const learnedCardCount = learnedDeck.learnedCardCount;
         const accountDeckDetail = await AccountDeckDetailModel.findOne({
           where: {
             account_id: accountID,

@@ -4,6 +4,7 @@ const CourseModel = require('../models/course.model');
 const sequelize = require('../db-connection');
 const azureStorage = require('../utils/azure-storage.util');
 const appConfig = require('../config/app.config');
+const accountCardDetailModel = require('../models/account-card-detail.model');
 
 const CardService = {
   getAllCards: async () => {
@@ -64,7 +65,7 @@ const CardService = {
           );
         }
         if (imageUrl === null) {
-          imageUrl = appConfig.DEFAULT_CARD_FRONT_IMAGE;
+          imageUrl = card.front_image;
         }
 
         updatedCard = await card.update(
@@ -117,12 +118,27 @@ const CardService = {
       throw error;
     }
   },
-  getCardsByDeckId: async (deckId, is_public = null) => {
+  getCardsByDeckId: async (deckId, is_public = null, account_id = null) => {
     try {
       const whereClause = is_public ? { deck_id: deckId, is_public } : { deck_id: deckId };
-      return await CardModel.findAll({
+      const cards = await CardModel.findAll({
         where: whereClause,
       });
+      if (account_id) {
+        const cardsWithProgress = await Promise.all(
+          cards.map(async (card) => {
+            const accountCardDetail = await accountCardDetailModel.findOne({
+              where: {
+                account_id,
+                card_id: card.id,
+              },
+            });
+            card.dataValues.is_learned = accountCardDetail ? true : false;
+            card.dataValues.last_reviewed_at = accountCardDetail ? accountCardDetail.last_reviewed_at : null;
+          })
+        );
+      }
+      return cards;
     } catch (error) {
       console.log(error);
       return error;

@@ -3,6 +3,7 @@ const courseModel = require('../models/course.model');
 const sequelize = require('sequelize');
 const azureStorage = require('../utils/azure-storage.util');
 const { DEFAULT_DECK_IMAGE } = require('../config/app.config');
+const accountDeckDetailModel = require('../models/account-deck-detail.model');
 
 const deckService = {
   getAllDecks: async (page = 1, limit = 12, is_public = null) => {
@@ -25,9 +26,24 @@ const deckService = {
       return error;
     }
   },
-  getDeckById: async (deckId) => {
+  getDeckById: async (deck_id, account_id) => {
     try {
-      const deck = await deckModel.findByPk(deckId);
+      const deck = await deckModel.findByPk(deck_id);
+      if (!deck) {
+        return null;
+      }
+      if (account_id) {
+        const accountDeckDetail = await accountDeckDetailModel.findOne({
+          where: {
+            deck_id: deck_id,
+            account_id: account_id,
+          },
+        });
+        deck.dataValues.learned_card_count = accountDeckDetail ? accountDeckDetail.learned_card_count : 0;
+        deck.dataValues.progress = accountDeckDetail
+          ? (accountDeckDetail.learned_card_count / deck.card_count) * 100
+          : 0;
+      }
       return deck;
     } catch (error) {
       console.log(error);
@@ -164,23 +180,36 @@ const deckService = {
       return error;
     }
   },
-  getDecksByCourseId: async (
-    courseId,
-    page = 1,
-    limit = 12,
-    is_public = null
-  ) => {
+  getDecksByCourseId: async (courseId, page = 1, limit = 12, is_public = null, account_id = null) => {
     try {
+      if (page < 1) {
+        page = 1;
+      }
       const offset = (page - 1) * limit;
-      const whereClause =
-        is_public === null
-          ? { course_id: courseId }
-          : { course_id: courseId, is_public: is_public };
+      const whereClause = is_public === null ? { course_id: courseId } : { course_id: courseId, is_public: is_public };
       const { count, rows } = await deckModel.findAndCountAll({
         where: whereClause,
         limit: limit,
         offset: offset,
       });
+      if (account_id) {
+        const decksWithProgress = await Promise.all(
+          rows.map(async (deck) => {
+            const accountDeckDetail = await accountDeckDetailModel.findOne({
+              where: {
+                deck_id: deck.id,
+                account_id: account_id,
+              },
+            });
+            deck.dataValues.learned_card_count = accountDeckDetail ? accountDeckDetail.learned_card_count : 0;
+            deck.dataValues.progress = accountDeckDetail
+              ? (accountDeckDetail.learned_card_count / deck.card_count) * 100
+              : 0;
+            deck.dataValues.last_reviewed_at = accountDeckDetail ? accountDeckDetail.last_reviewed_at : null;
+            return deck;
+          })
+        );
+      }
       return {
         total: count,
         decks: rows,

@@ -25,6 +25,11 @@ class AccountCardDetailModel extends Sequelize.Model {
             key: 'id',
           },
         },
+        performance: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         last_reviewed_at: {
           type: DataTypes.DATE,
           allowNull: false,

@@ -26,6 +26,7 @@ const Courses = () => {
   const handleFetchDecks = async () => {
     const fetchedDecks = await fetchGetDecksByCourseId(courseId, currentPage);
     if (fetchedDecks) {
+      // console.log(fetchedDecks);
       setDecks(fetchedDecks.decks);
       setTotalPages(fetchedDecks.totalPages);
       if (currentPage > fetchedDecks.totalPages) {
@@ -101,7 +102,9 @@ const Courses = () => {
           </Grid>
         </Grid>
       </Box>
-      <Typography variant="h1">Bộ thẻ</Typography>
+      <Typography variant="h2" sx={{ textAlign: 'center', margin: '10px' }}>
+        Đã học {course.learned_deck_count} / {course.deck_count} bộ thẻ
+      </Typography>
       <CourseItems decks={decks}></CourseItems>
       <Pagination
         count={totalPages}

@@ -6,6 +6,9 @@ const accountCourseDetailModel = require('../models/account-course-detail.model'
 const courseService = {
   getAllCourses: async (page = 1, limit = 10, isPublic = null, accountId = null) => {
     try {
+      if (page < 1) {
+        page = 1;
+      }
       const offset = (page - 1) * limit;
       const whereClause = {};
       if (isPublic !== null) {
@@ -26,7 +29,14 @@ const courseService = {
               },
             });
             course.dataValues.learned_deck_count = accountCourseDetail ? accountCourseDetail.learned_deck_count : 0;
-            course.dataValues.get
+            course.dataValues.learned_card_count = accountCourseDetail ? accountCourseDetail.learned_card_count : 0;
+            course.dataValues.deck_progress = accountCourseDetail
+              ? (accountCourseDetail.learned_deck_count / course.deck_count) * 100
+              : 0;
+            course.dataValues.card_progress = accountCourseDetail
+              ? (accountCourseDetail.learned_card_count / course.card_count) * 100
+              : 0;
+            course.dataValues.last_reviewed_at = accountCourseDetail ? accountCourseDetail.last_reviewed_at : null;
             return course;
           })
         );
@@ -43,9 +53,28 @@ const courseService = {
       return error;
     }
   },
-  getCourseById: async (courseId) => {
+  getCourseById: async (courseId, accountId) => {
     try {
       const course = await courseModel.findByPk(courseId);
+      if (!course) {
+        return null;
+      }
+      if (accountId) {
+        const accountCourseDetail = await accountCourseDetailModel.findOne({
+          where: {
+            account_id: accountId,
+            course_id: courseId,
+          },
+        });
+        course.dataValues.learned_deck_count = accountCourseDetail ? accountCourseDetail.learned_deck_count : 0;
+        course.dataValues.learned_card_count = accountCourseDetail ? accountCourseDetail.learned_card_count : 0;
+        course.dataValues.deck_progress = accountCourseDetail
+          ? (accountCourseDetail.learned_deck_count / course.deck_count) * 100
+          : 0;
+        course.dataValues.card_progress = accountCourseDetail
+          ? (accountCourseDetail.learned_card_count / course.card_count) * 100
+          : 0;
+      }
       return course;
     } catch (error) {
       console.log(error);

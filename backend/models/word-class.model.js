@@ -1,6 +1,6 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-class WordClass extends Sequelize.Model {
+class WordClassModel extends Sequelize.Model {
   static init(sequelize) {
     return super.init(
       {
@@ -25,4 +25,4 @@ class WordClass extends Sequelize.Model {
   }
 }
 
-module.exports = WordClass;
+module.exports = WordClassModel;

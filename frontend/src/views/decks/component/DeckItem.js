@@ -1,7 +1,7 @@
 import React from 'react';
 
 // MATERIAL UI COMPONENTS
-import { Box, Card, CardContent, CardMedia, Typography } from '@mui/material';
+import { Box, Card, CardContent, CardMedia, LinearProgress, Typography } from '@mui/material';
 
 // STYLE COMPONENTS
 import '../../../assets/css/modal-style.css';
@@ -12,11 +12,11 @@ import Divider from '@mui/material/Divider';
 import { useNavigate } from 'react-router';
 
 import CardActionArea from '@mui/material/CardActionArea';
+import formatDate from 'src/utilities/Date';
 const CourseItem = ({ deck }) => {
   const navigate = useNavigate();
 
-  const openDeck = (deckId) => {
-    console.log(deckId);
+  const openDeck = () => {
     navigate(`/courses/${deck.course_id}/decks/${deck.id}/cards`);
   };
 
@@ -32,7 +32,17 @@ const CourseItem = ({ deck }) => {
 
   return (
     <Box>
-      <Card sx={{ maxWidth: 345 }}>
+      <Card
+        sx={{
+          maxWidth: 345,
+          border:
+            deck.learned_card_count === deck.card_count
+              ? '2px solid green'
+              : deck.learned_card_count !== 0
+              ? '2px solid orange'
+              : '2px solid black',
+        }}
+      >
         <CardActionArea onClick={openDeck}>
           <CardMedia image={deck.image_url} className="course-image" title="green iguana" />
           <CardContent>
@@ -54,7 +64,20 @@ const CourseItem = ({ deck }) => {
             >
               {renderCardDescription(deck.description)}
             </Typography>
-            <Divider />
+            {/* <p>{deck.process}</p> */}
+            <LinearProgress
+              variant="determinate"
+              value={deck.progress}
+              sx={{ marginTop: '10px' }}
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+              {deck.learned_card_count} / {deck.card_count} thẻ đã học
+            </Typography>
+            {deck.last_reviewed_at && (
+              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                Lần học cuối: {formatDate(deck.last_reviewed_at)}
+              </Typography>
+            )}
           </CardContent>
         </CardActionArea>
       </Card>

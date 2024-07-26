@@ -59,7 +59,9 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
 
   return (
     <Box>
-      <Card sx={{ maxWidth: 345 }}>
+      <Card
+        sx={{ maxWidth: 345, border: course.is_need_pro ? '2px solid yellow' : '2px solid black' }}
+      >
         <CardMedia image={course.image_url} className="course-image" title="green iguana" />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">

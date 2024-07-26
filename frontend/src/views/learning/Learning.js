@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { fetchGetCardsByDeckId } from 'src/services/CardService';
+
 import { Card, CardContent, Typography, CardMedia } from '@mui/material';
 import '../../assets/css/flashcard.css';
 import '../../assets/css/course-card.css';
@@ -9,14 +9,17 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { fetchGetDeckById } from 'src/services/DeskService';
+import { fetchGetCardsToLearnByDeckId } from 'src/services/LearningService';
 
+import { fetchFinishLearning } from 'src/services/LearningService';
 const Learning = () => {
   const { deckId } = useParams();
-  const [cards, setCards] = useState([]);
+  const [cards, setCards] = useState([0]);
   const [deck, setDeck] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [frontAudioUrl, setFrontAudioUrl] = useState('');
+  const [LearnedCards, setLearnedCards] = useState([]);
   const navigate = useNavigate();
 
   const handleGetDeck = async () => {
@@ -25,8 +28,7 @@ const Learning = () => {
   };
 
   const fetchCards = async () => {
-    const fetchedCards = await fetchGetCardsByDeckId(deckId);
-    console.log(fetchedCards);
+    const fetchedCards = await fetchGetCardsToLearnByDeckId(deckId);
     setCards(fetchedCards || []);
   };
 
@@ -36,17 +38,50 @@ const Learning = () => {
     audio.play();
   };
 
-  const handleNextCard = () => {
-    if (currentIndex < cards.length - 1) {
-      // console.log('isFlipped', isFlipped);
-      setCurrentIndex(currentIndex + 1);
-      setIsFlipped(false);
-    } else {
-      alert('You have finished studying this deck.');
-      navigate('/'); // Redirect to home or any other page
+  const handleFinishLearning = async () => {
+    try {
+      await fetchFinishLearning(LearnedCards);
+      navigate(`/courses/${deck.course_id}/decks/${deckId}/cards`);
+    } catch (error) {
+      console.log(error);
     }
   };
 
+  const handleNextCard = (performance) => {
+    let currentCard = cards[currentIndex];
+    currentCard.performance += performance;
+    currentCard.learned_count += 1;
+    // console.log('when add performance', cards);
+    let newCards = cards.slice(1);
+    if (currentCard.learned_count < 2) {
+      // console.log('newCards', newCards);
+      const randomIndex = Math.floor(Math.random() * newCards.length);
+      newCards.splice(randomIndex, 0, currentCard);
+      // console.log('newCards', newCards);
+    } else {
+      console.log(currentCard);
+      setLearnedCards([...LearnedCards, currentCard]);
+    }
+    if (newCards.length === 0) {
+      // handleFinishLearning();
+      alert('Hết từ rồi! Hay lắm!');
+    }
+    setCards(newCards);
+  };
+
+  useEffect(() => {
+    if (cards.length === 0) {
+      handleFinishLearning();
+    }
+  }, [cards]);
+  const handleKnowCard = () => {
+    console.log('handleKnowCard');
+    handleNextCard(1);
+  };
+  const handleNotKnowCard = () => {
+    console.log('handleNotKnowCard');
+    handleNextCard(-1);
+  };
   const toggleFlip = () => {
     setIsFlipped(!isFlipped);
   };
@@ -81,15 +116,12 @@ const Learning = () => {
                     </Typography>
 
                     <Typography variant="h6" component="div">
+                      {cards[currentIndex].word_class_name}
+                    </Typography>
+
+                    <Typography variant="h6" component="div">
                       {cards[currentIndex].front_pronunciation}
                       <VolumeUpIcon onClick={playAudio} style={{ cursor: 'pointer' }} />
-                      {/* <Stack>
-                          <audio controls key={frontAudioUrl}>
-                            <source src={frontAudioUrl} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                          </audio>
-                          <VolumeUpIcon onClick={playAudio} style={{ cursor: 'pointer' }} />
-                        </Stack> */}
                     </Typography>
                   </CardContent>
                 </Card>
@@ -104,9 +136,15 @@ const Learning = () => {
                 </Card>
               </Box>
             </Box>
-            <Button className="next-card-indicator" onClick={handleNextCard}>
-              Next Card
+            <Button className="not-known-indicator" onClick={handleNotKnowCard}>
+              Chưa nhớ từ này
             </Button>
+            <Button className="known-indicator" onClick={handleKnowCard}>
+              Đã nhớ từ này
+            </Button>
+            <Typography variant="h6" component="div" sx={{ mt: 3 }}>
+              Số thẻ còn lại: {cards.length}
+            </Typography>
           </Box>
 
           {/* </Stack> */}

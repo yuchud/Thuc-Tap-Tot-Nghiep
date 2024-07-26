@@ -7,7 +7,6 @@ import { useNavigate } from 'react-router';
 import { useLocation } from 'react-router-dom';
 
 const Courses = () => {
-  const account_id = localStorage.getItem('id');
   const [courses, setCourses] = useState([]);
 
   const [currentPage, setCurrentPage] = React.useState(0);
@@ -19,6 +18,7 @@ const Courses = () => {
   const handleFetchCourses = async () => {
     const fetchedCourses = await fetchGetAllCourses(currentPage, coursesPerPage);
     if (fetchedCourses) {
+      console.log(fetchedCourses.courses);
       setCourses(fetchedCourses.courses);
       setTotalPages(fetchedCourses.totalPages);
       if (currentPage > fetchedCourses.totalPages) {

@@ -32,7 +32,10 @@ import { Button } from 'bootstrap';
 
 import { fetchGetAccount } from '../../../services/AccountService';
 
+import LinearProgress from '@mui/material/LinearProgress';
 import Badge from '@mui/material/Badge';
+
+import formatDate from '../../../utilities/Date';
 const CourseItem = ({ course }) => {
   const renderCardDescription = (description) => {
     if (description === null) return '';
@@ -52,10 +55,23 @@ const CourseItem = ({ course }) => {
     }
     navigate(`/courses/${courseId}/decks`);
   };
+
   return (
     <Box>
       {course.is_need_pro && <Badge color="warning" badgeContent="Pro" />}
-      <Card sx={{ maxWidth: 345 }}>
+      <Card
+        sx={{
+          maxWidth: 345,
+          border:
+            course.learned_deck_count === course.deck_count
+              ? '2px solid green'
+              : course.learned_deck_count !== 0
+              ? '2px solid orange'
+              : course.is_need_pro
+              ? '2px solid yellow'
+              : '2px solid black',
+        }}
+      >
         <CardActionArea onClick={() => openCourse(course.id)}>
           <CardMedia image={course.image_url} className="course-image" title="green iguana" />
           <CardContent>
@@ -77,7 +93,31 @@ const CourseItem = ({ course }) => {
             >
               {renderCardDescription(course.description)}
             </Typography>
-            <Divider />
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={course.deck_progress}
+                sx={{ marginTop: '10px' }}
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                {course.learned_deck_count} / {course.deck_count} bộ thẻ đã học
+              </Typography>
+            </Box>
+            <Box>
+              <LinearProgress
+                variant="determinate"
+                value={course.card_progress}
+                sx={{ marginTop: '10px' }}
+              />
+              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                {course.learned_card_count} / {course.card_count} thẻ đã học
+              </Typography>
+            </Box>
+            {course.last_reviewed_at && (
+              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                Lần học cuối: {formatDate(course.last_reviewed_at)}
+              </Typography>
+            )}
           </CardContent>
         </CardActionArea>
       </Card>

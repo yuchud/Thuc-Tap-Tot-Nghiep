@@ -18,16 +18,15 @@ const deckController = {
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
   getDeckById: async (req, res) => {
     const { id } = req.params;
+    const { account_id } = req.query;
     try {
-      const deck = await deckService.getDeckById(id);
+      const deck = await deckService.getDeckById(id, account_id);
       if (!deck) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),
@@ -36,9 +35,7 @@ const deckController = {
       res.status(http.StatusCodes.OK).json(deck);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -50,28 +47,19 @@ const deckController = {
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
   getPublicDecksByCourseId: async (req, res) => {
-    const { id } = req.params;
     try {
-      const { page, limit } = req.query;
-      const decks = await deckService.getDecksByCourseId(
-        id,
-        +page,
-        +limit,
-        true
-      );
+      const { id } = req.params;
+      const { page, limit, account_id } = req.query;
+      const decks = await deckService.getDecksByCourseId(id, +page, +limit, true, account_id);
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -99,16 +87,11 @@ const deckController = {
         course_id,
       });
       res.status(http.StatusCodes.CREATED).json({
-        message: requestMessageUtil.successActionObject(
-          actionCreate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionCreate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -138,16 +121,11 @@ const deckController = {
         is_public,
       });
       res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionUpdate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionUpdate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -162,10 +140,7 @@ const deckController = {
       }
       if (deck.card_count > 0) {
         return res.status(http.StatusCodes.BAD_REQUEST).json({
-          message: requestMessageUtil.cannotDeleteObjectWithChild(
-            objectName,
-            CARD
-          ),
+          message: requestMessageUtil.cannotDeleteObjectWithChild(objectName, CARD),
         });
       }
 
@@ -176,16 +151,11 @@ const deckController = {
         });
       }
       res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionDelete,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionDelete, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   getCardsByDeckId: async (req, res) => {
@@ -206,9 +176,7 @@ const deckController = {
       res.status(http.StatusCodes.OK).json(cards);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 };

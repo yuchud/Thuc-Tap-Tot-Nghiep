@@ -8,7 +8,6 @@ const nameProp = require('../utils/props-and-objects.util').PROPS.NAME;
 const DECK = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const requestMessageUtil = require('../utils/requestMessage.util');
 
-
 const courseController = {
   getAllCourses: async (req, res) => {
     try {
@@ -33,8 +32,9 @@ const courseController = {
   },
   getCourseById: async (req, res) => {
     const { id } = req.params;
+    const { account_id } = req.query;
     try {
-      const course = await courseService.getCourseById(id);
+      const course = await courseService.getCourseById(id, account_id);
       if (!course) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),

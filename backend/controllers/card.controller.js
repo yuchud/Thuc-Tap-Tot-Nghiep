@@ -4,8 +4,7 @@ const objectName = require('../utils/props-and-objects.util').OBJECTS.CARD;
 const actionCreate = require('../utils/props-and-objects.util').ACTIONS.CREATE;
 const actionUpdate = require('../utils/props-and-objects.util').ACTIONS.UPDATE;
 const actionDelete = require('../utils/props-and-objects.util').ACTIONS.DELETE;
-const frontTextProp = require('../utils/props-and-objects.util').PROPS
-  .FRONT_TEXT;
+const frontTextProp = require('../utils/props-and-objects.util').PROPS.FRONT_TEXT;
 const backTextProp = require('../utils/props-and-objects.util').PROPS.BACK_TEXT;
 const DECK = require('../utils/props-and-objects.util').OBJECTS.DECK;
 const requestMessageUtil = require('../utils/requestMessage.util');
@@ -18,9 +17,7 @@ const CardController = {
       res.status(http.StatusCodes.OK).json(cards);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   createCard: async (req, res) => {
@@ -31,23 +28,17 @@ const CardController = {
       const card = await cardService.createCard(cardData, front_image);
 
       res.status(http.StatusCodes.CREATED).json({
-        message: requestMessageUtil.successActionObject(
-          actionCreate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionCreate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   updateCard: async (req, res) => {
     try {
       const { id } = req.params;
-      const { front_text, back_text, deck_id, is_public, word_class_id } =
-        req.body;
+      const { front_text, back_text, deck_id, is_public, word_class_id } = req.body;
       const front_image = req.file;
       const updatedCard = await cardService.updateCard(
         id,
@@ -64,16 +55,11 @@ const CardController = {
         });
       }
       return res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionUpdate,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionUpdate, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -87,22 +73,18 @@ const CardController = {
         });
       }
       return res.status(http.StatusCodes.OK).json({
-        message: requestMessageUtil.successActionObject(
-          actionDelete,
-          objectName
-        ),
+        message: requestMessageUtil.successActionObject(actionDelete, objectName),
       });
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   getPublicCardsByDeckId: async (req, res) => {
     const { id } = req.params;
+    const { account_id } = req.query;
     try {
-      const cards = await cardService.getCardsByDeckId(id, true);
+      const cards = await cardService.getCardsByDeckId(id, true, account_id);
       if (!cards) {
         return res.status(http.StatusCodes.NOT_FOUND).json({
           message: requestMessageUtil.notFoundObject(objectName),
@@ -111,9 +93,7 @@ const CardController = {
       res.status(http.StatusCodes.OK).json(cards);
     } catch (error) {
       console.log(error);
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 };
