@@ -27,6 +27,9 @@ import { useNavigate } from 'react-router';
 import WordClassChip from './WordClassChip';
 import Stack from '@mui/material/Stack';
 
+import Chip from '@mui/material/Chip';
+
+import formatDate from '../../utilities/Date';
 const CardItem = ({ card, wordClasses, onUpdateCardClick, onDeleteCardClick }) => {
   const CardActionsStyled = styled(CardActions)({
     display: 'flex',
@@ -109,6 +112,12 @@ const CardItem = ({ card, wordClasses, onUpdateCardClick, onDeleteCardClick }) =
             />
           </BottomNavigation>
         </CardActionsStyled>
+        <Box sx={{ m: 1 }}>
+          <Divider sx={{ m: 1 }} />
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Chỉnh sửa lần cuối: {formatDate(card.updated_at)}
+          </Typography>
+        </Box>
       </Card>
     </Box>
   );

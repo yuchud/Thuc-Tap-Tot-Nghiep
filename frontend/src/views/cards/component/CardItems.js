@@ -3,8 +3,9 @@ import '../../../assets/css/modal-style.css';
 import '../../../assets/css/course-card.css';
 
 import { List, ListItem, ListItemText, Divider, Box, Typography } from '@mui/material';
-import formatDate from 'src/views/utilities/Date';
+import formatDate from 'src/utilities/Date';
 
+import CardItem from './CardItem';
 const style = {
   py: 0,
   width: '100%',
@@ -28,9 +29,7 @@ const DeckItems = ({ cards }) => {
         {cards.map((card, index) => (
           <>
             <ListItem key={index} style={card.is_learned ? learned_style : {}}>
-              <ListItemText primary={card.front_text} secondary={card.back_text} />
-              {/* <ListItemText primary={card.front_text} /> */}
-              {card.is_learned && <p>{formatDate(card.last_reviewed_at)}</p>}
+              <CardItem card={card} />
             </ListItem>
             <Divider component="li" />
           </>

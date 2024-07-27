@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';
 import CustomTextField from '../../components/forms/theme-elements/CustomTextField';
-import ProfileTabs from './ProfileTabs';
 import CustomSnackbar from 'src/components/snackbar/CustomSnackbar';
 import { set } from 'lodash';
 import { fetchUpdatePassword } from 'src/services/AccountService';

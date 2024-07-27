@@ -26,6 +26,10 @@ import CourseTags from './CourseTags';
 import { useNavigate } from 'react-router';
 import Stack from '@mui/material/Stack';
 
+import Chip from '@mui/material/Chip';
+
+import formatDate from '../../utilities/Date';
+
 const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
   const CardActionsStyled = styled(CardActions)({
     display: 'flex',
@@ -107,6 +111,14 @@ const CourseItem = ({ course, onUpdateCourseClick, onDeleteCourseClick }) => {
             />
           </BottomNavigation>
         </CardActionsStyled>
+        <Box sx={{ m: 1 }}>
+          <Chip label={`${course.deck_count} bộ thẻ`} sx={{ mr: 1 }} />
+          <Chip label={`${course.card_count} thẻ`} />
+          <Divider sx={{ m: 1 }} />
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Chỉnh sửa lần cuối: {formatDate(course.updated_at)}
+          </Typography>
+        </Box>
       </Card>
     </Box>
   );

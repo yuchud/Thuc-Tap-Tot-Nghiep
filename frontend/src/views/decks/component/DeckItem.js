@@ -74,9 +74,12 @@ const CourseItem = ({ deck }) => {
               {deck.learned_card_count} / {deck.card_count} thẻ đã học
             </Typography>
             {deck.last_reviewed_at && (
-              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
-                Lần học cuối: {formatDate(deck.last_reviewed_at)}
-              </Typography>
+              <Box>
+                <Divider />
+                <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                  Lần học cuối: {formatDate(deck.last_reviewed_at)}
+                </Typography>
+              </Box>
             )}
           </CardContent>
         </CardActionArea>

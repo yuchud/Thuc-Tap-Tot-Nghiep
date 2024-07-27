@@ -55,6 +55,12 @@ const Menuitems = [
     icon: IconUserPlus,
     href: '/customers',
   },
+  // {
+  //   id: uniqueId(),
+  //   title: 'Pro Plans',
+  //   icon: IconUserPlus,
+  //   href: '/pro-plans',
+  // },
   {
     navlabel: true,
     subheader: 'Extra',

@@ -49,7 +49,16 @@ class AccountsModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: false,
         },
+        pro_expired_at: {
+          type: DataTypes.DATE,
+          allowNull: true,
+        },
         created_at: {
+          type: DataTypes.DATE,
+          allowNull: false,
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
+        updated_at: {
           type: DataTypes.DATE,
           allowNull: false,
           defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),

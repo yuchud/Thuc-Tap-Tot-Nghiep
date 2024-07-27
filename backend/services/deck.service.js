@@ -138,6 +138,7 @@ const deckService = {
           description,
           image_url: imageUrl,
           is_public,
+          updated_at: new Date(),
         },
         {
           where: {

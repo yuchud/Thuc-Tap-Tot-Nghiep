@@ -76,6 +76,7 @@ const CardService = {
             deck_id,
             is_public,
             word_class_id,
+            updated_at: new Date(),
           },
           { transaction: t }
         );

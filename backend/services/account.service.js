@@ -69,10 +69,7 @@ const accountService = {
     try {
       const account = await accountModel.findOne({
         where: {
-          [sequelize.Sequelize.Op.or]: [
-            { username: usernameOrEmail },
-            { email: usernameOrEmail },
-          ],
+          [sequelize.Sequelize.Op.or]: [{ username: usernameOrEmail }, { email: usernameOrEmail }],
         },
       });
       return account;
@@ -138,10 +135,7 @@ const accountService = {
   updatePassword: async (account_id, newPassword) => {
     try {
       const hashedPassword = await hashPassword(newPassword);
-      accountModel.update(
-        { password: hashedPassword },
-        { where: { id: account_id } }
-      );
+      accountModel.update({ password: hashedPassword }, { where: { id: account_id } });
       return {
         message: 'Update password successfully',
         account_id: account_id,
@@ -171,11 +165,9 @@ const accountService = {
       // const account_id = account.id;
       // const user = await accountService.getAccountById(account_id);
       // console.log(account.account_role_id);
-      const token = jwt.sign(
-        { id: account.id, role: account.account_role_id },
-        appConfig.JWT_SECRET,
-        { expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s` }
-      );
+      const token = jwt.sign({ id: account.id, role: account.account_role_id }, appConfig.JWT_SECRET, {
+        expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s`,
+      });
 
       return { message: 'Login successfully', token: token };
     } catch (error) {
@@ -198,6 +190,8 @@ const accountService = {
         account.gmail = null;
       }
       // console.log(account);
+      account.updated_at = new Date();
+      console.log(account);
       const updatedAccount = await accountModel.update(account, {
         where: { id: account_id },
       });
@@ -217,14 +211,8 @@ const accountService = {
         return { error: 'Account not found' };
       }
       await sequelize.transaction(async (t) => {
-        await customerModel.destroy(
-          { where: { account_id: account_id } },
-          { transaction: t }
-        );
-        await accountModel.destroy(
-          { where: { id: account_id } },
-          { transaction: t }
-        );
+        await customerModel.destroy({ where: { account_id: account_id } }, { transaction: t });
+        await accountModel.destroy({ where: { id: account_id } }, { transaction: t });
       });
       return { message: 'Delete account successfully' };
     } catch (error) {

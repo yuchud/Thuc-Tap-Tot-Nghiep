@@ -44,16 +44,19 @@ const Header = (props) => {
         </Box>
         <Stack spacing={1} direction="row" alignItems="center">
           <HeaderButton color="primary" href="/home">
-            Home
+            Trang chủ
           </HeaderButton>
           <HeaderButton color="primary" href="/courses">
-            Course
+            Khóa Học
           </HeaderButton>
           <HeaderButton color="primary" href="/about">
-            About
+            Giới thiệu
           </HeaderButton>
           <HeaderButton color="primary" href="/contact">
-            Contact
+            Liên hệ
+          </HeaderButton>
+          <HeaderButton color="primary" href="/pro-plans">
+            Gói Pro
           </HeaderButton>
         </Stack>
         {/* {props.isAdmin && (

@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Typography } from '@mui/material';
 import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
 import InputFileUpload from 'src/components/forms/theme-elements/InputFileUpload';
-import { useNavigate } from 'react-router-dom';
-import { MenuItem } from '@mui/material';
-import { ListItemIcon } from '@mui/material';
-import { ListItemText } from '@mui/material';
-import { IconListCheck, IconMail } from '@tabler/icons';
-import { IconUser } from '@tabler/icons';
 import { fetchGetAccount, fetchUpdateAccount } from 'src/services/AccountService';
-import { set } from 'lodash';
 
 import CustomSnackbar from 'src/components/snackbar/CustomSnackbar';
 const Profile = () => {

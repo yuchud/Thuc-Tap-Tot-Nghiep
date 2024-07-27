@@ -9,6 +9,16 @@ const deckService = {
     const seconds = date.getSeconds();
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   },
+  addMonth: (date, months) => {
+    console.log(date);
+    const days = months * 30;
+    const hours = days * 24;
+    const minutes = hours * 60;
+    const seconds = minutes * 60;
+    const milliseconds = seconds * 1000;
+
+    return new Date(date.getTime() + milliseconds);
+  },
 };
 
 module.exports = deckService;

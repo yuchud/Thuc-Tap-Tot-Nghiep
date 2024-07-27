@@ -63,7 +63,8 @@ const CourseItem = ({ course }) => {
         sx={{
           maxWidth: 345,
           border:
-            course.learned_deck_count === course.deck_count
+            course.learned_deck_count === course.deck_count &&
+            course.learned_card_count === course.card_count
               ? '2px solid green'
               : course.learned_deck_count !== 0
               ? '2px solid orange'
@@ -114,9 +115,12 @@ const CourseItem = ({ course }) => {
               </Typography>
             </Box>
             {course.last_reviewed_at && (
-              <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
-                Lần học cuối: {formatDate(course.last_reviewed_at)}
-              </Typography>
+              <Box>
+                <Divider />
+                <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+                  Lần học cuối: {formatDate(course.last_reviewed_at)}
+                </Typography>
+              </Box>
             )}
           </CardContent>
         </CardActionArea>

@@ -296,7 +296,7 @@ const Cards = () => {
       setSnackbarMessage('Sửa thẻ thành công');
       setSnackbarSeverity('success');
       setIsSnackbarOpen(true);
-      handleCloseModal();
+      // handleCloseModal();
       refreshData();
     } catch (error) {
       console.log(error);

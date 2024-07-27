@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes } = require('sequelize');
 
 class ProPlanModel extends Sequelize.Model {
   static init(sequelize) {
@@ -14,9 +14,25 @@ class ProPlanModel extends Sequelize.Model {
           allowNull: false,
           unique: true,
         },
-        price: {
+        price_per_month: {
           type: DataTypes.DECIMAL(12, 2),
           allowNull: false,
+          default: 0,
+        },
+        month_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          default: 1,
+        },
+        is_public: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
+        },
+        is_recommend: {
+          type: DataTypes.BOOLEAN,
+          allowNull: false,
+          defaultValue: false,
         },
         description: {
           type: DataTypes.TEXT,
@@ -25,13 +41,13 @@ class ProPlanModel extends Sequelize.Model {
         created_at: {
           type: DataTypes.DATE,
           allowNull: false,
-          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
-        }
+          defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
+        },
       },
       {
         sequelize,
-        modelName: "ProPlan",
-        tableName: "pro_plans",
+        modelName: 'ProPlan',
+        tableName: 'pro_plans',
         timestamps: false,
       }
     );

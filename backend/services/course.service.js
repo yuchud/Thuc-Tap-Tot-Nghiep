@@ -160,6 +160,7 @@ const courseService = {
           image_url: imageUrl,
           is_public,
           is_need_pro,
+          updated_at: new Date(),
         },
         {
           where: {

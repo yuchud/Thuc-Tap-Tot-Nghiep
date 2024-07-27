@@ -1,16 +1,12 @@
 require('dotenv').config();
 const dbConfig = require('./config/db.config');
 const Sequelize = require('sequelize');
+const PurchaseHistoryModel = require('./models/purchase-history.model');
 
-const sequelize = new Sequelize(
-  dbConfig.database,
-  dbConfig.user,
-  dbConfig.password,
-  {
-    host: dbConfig.host,
-    dialect: dbConfig.dialect,
-  }
-);
+const sequelize = new Sequelize(dbConfig.database, dbConfig.user, dbConfig.password, {
+  host: dbConfig.host,
+  dialect: dbConfig.dialect,
+});
 
 const models = {
   AccountRoleModel: require('./models/account-role.model').init(sequelize),
@@ -20,15 +16,11 @@ const models = {
   CourseModel: require('./models/course.model').init(sequelize),
   CardModel: require('./models/card.model').init(sequelize),
   WordClassModel: require('./models/word-class.model').init(sequelize),
+  PurchaseHistoryModel: require('./models/purchase-history.model').init(sequelize),
 
-  AccountCourseDetailModel:
-    require('./models/account-course-detail.model').init(sequelize),
-  AccountDeckDetailModel: require('./models/account-deck-detail.model').init(
-    sequelize
-  ),
-  AccountCardDetailModel: require('./models/account-card-detail.model').init(
-    sequelize
-  ),
+  AccountCourseDetailModel: require('./models/account-course-detail.model').init(sequelize),
+  AccountDeckDetailModel: require('./models/account-deck-detail.model').init(sequelize),
+  AccountCardDetailModel: require('./models/account-card-detail.model').init(sequelize),
 };
 
 Object.values(models)

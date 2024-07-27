@@ -6,9 +6,9 @@ import { IconBellRinging } from '@tabler/icons';
 const LoginRightGroupHeader = () => {
   return (
     <Stack spacing={1} direction="row" alignItems="center">
-      <Button variant="contained" color="primary" href="/pro-plans">
+      {/* <Button variant="contained" color="primary" href="/pro-plans">
         Upgrade to Pro
-      </Button>
+      </Button> */}
       <IconButton
         size="large"
         aria-label="show 11 new notifications"

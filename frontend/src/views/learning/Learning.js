@@ -54,10 +54,9 @@ const Learning = () => {
     // console.log('when add performance', cards);
     let newCards = cards.slice(1);
     if (currentCard.learned_count < 2) {
-      // console.log('newCards', newCards);
-      const randomIndex = Math.floor(Math.random() * newCards.length);
-      newCards.splice(randomIndex, 0, currentCard);
-      // console.log('newCards', newCards);
+      //// const randomIndex = Math.floor(Math.random() * newCards.length);
+      //// newCards.splice(randomIndex, 0, currentCard);
+      newCards.push(currentCard);
     } else {
       console.log(currentCard);
       setLearnedCards([...LearnedCards, currentCard]);

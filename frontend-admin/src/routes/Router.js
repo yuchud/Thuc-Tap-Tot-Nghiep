@@ -23,6 +23,8 @@ const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const Users = Loadable(lazy(() => import('../views/users/Users.js')));
 const Cards = Loadable(lazy(() => import('../views/cards/Cards.js')));
 const Customers = Loadable(lazy(() => import('../views/customers/Customers.js')));
+// const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans.js')));
+
 const Router = [
   {
     path: '/',
@@ -34,6 +36,7 @@ const Router = [
       { path: '/courses/:courseId/decks', exact: true, element: <Decks /> },
       { path: '/courses', exact: true, element: <Courses /> },
       { path: '/customers', exact: true, element: <Customers /> },
+      // { path: '/pro-plans', exact: true, element: <ProPlans /> },
 
       // { path: 'desks', exact: true, element: <Decks /> },
       { path: '/users', exact: true, element: <Users /> },
