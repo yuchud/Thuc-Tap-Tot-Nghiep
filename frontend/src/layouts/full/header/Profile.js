@@ -16,9 +16,12 @@ import { IconListCheck, IconMail, IconUser } from '@tabler/icons';
 // import ProfileImg from 'src/assets/images/profile/user-1.jpg';
 import { fetchGetAccount, fetchGetAccountAvatar } from 'src/services/AccountService';
 
+import Badge from '@mui/material/Badge';
+
 const Profile = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const [profileImage, setProfileImage] = useState(null);
+  const [isPro, setIsPro] = useState(false);
   const handleClick2 = (event) => {
     setAnchorEl2(event.currentTarget);
   };
@@ -29,6 +32,7 @@ const Profile = () => {
     try {
       const response = await fetchGetAccount();
       setProfileImage(response.avatar_url);
+      setIsPro(response.is_pro);
     } catch (error) {
       console.error(error);
     }
@@ -56,6 +60,17 @@ const Profile = () => {
         }}
         onClick={handleClick2}
       >
+        {isPro && (
+          <Badge
+            color="warning"
+            badgeContent="Pro"
+            sx={{
+              position: 'absolute',
+              top: 15,
+              left: 10,
+            }}
+          />
+        )}
         <Avatar
           src={profileImage}
           alt={'Avatar'}
@@ -88,7 +103,7 @@ const Profile = () => {
           </ListItemIcon>
           <ListItemText onClick={() => navigation('/profile')}>Thông tin cá nhân</ListItemText>
         </MenuItem>
-        <MenuItem>
+        {/* <MenuItem>
           <ListItemIcon>
             <IconMail width={20} />
           </ListItemIcon>
@@ -99,7 +114,7 @@ const Profile = () => {
             <IconListCheck width={20} />
           </ListItemIcon>
           <ListItemText>My Tasks</ListItemText>
-        </MenuItem>
+        </MenuItem> */}
         <Box mt={1} py={1} px={2}>
           <Button
             to="/auth/login"

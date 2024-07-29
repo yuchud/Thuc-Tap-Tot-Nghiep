@@ -11,18 +11,19 @@ import Decks from 'src/views/decks/Decks';
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
 
 /* ****Pages***** */
-const Dashboard = Loadable(lazy(() => import('../views/dashboard/Dashboard')));
+const Dashboard = Loadable(lazy(() => import('../views/dashboard/revenue/Revenue')));
 const Courses = Loadable(lazy(() => import('../views/courses/Courses')));
 const SamplePage = Loadable(lazy(() => import('../views/sample-page/SamplePage')));
 const Icons = Loadable(lazy(() => import('../views/icons/Icons')));
-const TypographyPage = Loadable(lazy(() => import('../views/utilities/TypographyPage')));
-const Shadow = Loadable(lazy(() => import('../views/utilities/Shadow')));
+const TypographyPage = Loadable(lazy(() => import('../utilities/TypographyPage')));
+const Shadow = Loadable(lazy(() => import('../utilities/Shadow')));
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Register = Loadable(lazy(() => import('../views/authentication/Register')));
 const Login = Loadable(lazy(() => import('../views/authentication/Login')));
 const Users = Loadable(lazy(() => import('../views/users/Users.js')));
 const Cards = Loadable(lazy(() => import('../views/cards/Cards.js')));
 const Customers = Loadable(lazy(() => import('../views/customers/Customers.js')));
+const Accounts = Loadable(lazy(() => import('../views/dashboard/accounts/Accounts')));
 // const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans.js')));
 
 const Router = [
@@ -36,6 +37,7 @@ const Router = [
       { path: '/courses/:courseId/decks', exact: true, element: <Decks /> },
       { path: '/courses', exact: true, element: <Courses /> },
       { path: '/customers', exact: true, element: <Customers /> },
+      { path: '/accounts', exact: true, element: <Accounts /> },
       // { path: '/pro-plans', exact: true, element: <ProPlans /> },
 
       // { path: 'desks', exact: true, element: <Decks /> },

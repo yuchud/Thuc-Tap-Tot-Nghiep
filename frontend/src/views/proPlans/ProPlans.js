@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { fetchGetAllProPlans, fetchPurchaseProPlan } from 'src/services/ProPlanService';
-import { formatPrice } from 'src/utilities/Price';
+import { formatPrice } from 'src/utilities/Money';
 
 const ProPlans = () => {
   const [proPlans, setProPlans] = React.useState([]);

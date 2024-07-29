@@ -1,12 +1,18 @@
 import { BASE_API_URL } from '../constants/api';
 // import axios from 'axios';
 import http from 'http-status-codes';
-export const fetchGetAllCourses = async (page = 1, limit = 10) => {
+export const fetchGetAllCourses = async (page = 1, limit = 10, searchQuery, isPublic, isPro) => {
   try {
     //const response = await axios.get(`${BASE_API_URL}/courses?page=${page}&limit=${limit}`);
-    const response = await fetch(`${BASE_API_URL}/courses?page=${page}&limit=${limit}`, {
-      method: 'GET',
-    });
+    console.log(
+      `${BASE_API_URL}/courses?page=${page}&limit=${limit}&search_query=${searchQuery}&is_public=${isPublic}&is_need_pro=${isPro}`,
+    );
+    const response = await fetch(
+      `${BASE_API_URL}/courses?page=${page}&limit=${limit}&search_query=${searchQuery}&is_public=${isPublic}&is_need_pro=${isPro}`,
+      {
+        method: 'GET',
+      },
+    );
     return response.json();
   } catch (error) {
     return error;
@@ -15,6 +21,7 @@ export const fetchGetAllCourses = async (page = 1, limit = 10) => {
 
 export const fetchGetCourseById = async (courseId) => {
   try {
+    console.log(`${BASE_API_URL}/courses/${courseId}`);
     //const response = await axios.get(`${BASE_API_URL}/courses/${courseId}`);
     const response = await fetch(`${BASE_API_URL}/courses/${courseId}`, {
       method: 'GET',

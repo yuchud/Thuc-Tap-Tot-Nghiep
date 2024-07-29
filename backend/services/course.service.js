@@ -2,25 +2,42 @@ const { DEFAULT_COURSE_IMAGE } = require('../config/app.config');
 const courseModel = require('../models/course.model');
 const azureStorage = require('../utils/azure-storage.util');
 const accountCourseDetailModel = require('../models/account-course-detail.model');
+const { Op } = require('sequelize');
 
 const courseService = {
-  getAllCourses: async (page = 1, limit = 10, isPublic = null, accountId = null) => {
+  getAllCourses: async (
+    page = 1,
+    limit = 10,
+    isPublic = -1,
+    isNeedPro = -1,
+    searchQuery = null,
+    accountId = null,
+    learning_state = -1
+  ) => {
     try {
       if (page < 1) {
         page = 1;
       }
+      // console.log(isPublic, isNeedPro, searchQuery);
       const offset = (page - 1) * limit;
       const whereClause = {};
-      if (isPublic !== null) {
+      if (isPublic && isPublic != -1) {
         whereClause.is_public = isPublic;
       }
-      const { count, rows } = await courseModel.findAndCountAll({
+      console.log(isPublic, isPublic != -1);
+      if (isNeedPro && isNeedPro != -1) {
+        whereClause.is_need_pro = isNeedPro;
+      }
+      if (searchQuery) {
+        whereClause.name = { [Op.like]: `%${searchQuery}%` };
+      }
+      let { count, rows } = await courseModel.findAndCountAll({
         where: whereClause,
         limit: limit,
         offset: offset,
       });
       if (accountId) {
-        const courseWithProgress = await Promise.all(
+        const filteredCourse = await Promise.all(
           rows.map(async (course) => {
             const accountCourseDetail = await accountCourseDetailModel.findOne({
               where: {
@@ -37,9 +54,41 @@ const courseService = {
               ? (accountCourseDetail.learned_card_count / course.card_count) * 100
               : 0;
             course.dataValues.last_reviewed_at = accountCourseDetail ? accountCourseDetail.last_reviewed_at : null;
+
+            let isLearning = false;
+            let isLearned = false;
+
+            if (accountCourseDetail) {
+              if (
+                accountCourseDetail.learned_card_count > 0 &&
+                accountCourseDetail.learned_card_count < course.card_count
+              ) {
+                isLearning = true;
+              }
+              if (accountCourseDetail.learned_card_count == course.card_count) {
+                isLearned = true;
+              }
+            }
+
+            course.dataValues.isLearning = isLearning;
+            course.dataValues.isLearned = isLearned;
             return course;
           })
         );
+        rows = filteredCourse.filter((course) => {
+          if (learning_state == -1) {
+            return true;
+          }
+          if (learning_state == 0) {
+            return !course.dataValues.isLearning && !course.dataValues.isLearned;
+          }
+          if (learning_state == 1) {
+            return course.dataValues.isLearning;
+          }
+          if (learning_state == 2) {
+            return course.dataValues.isLearned;
+          }
+        });
       }
       // console.log(rows);
       return {

@@ -31,6 +31,11 @@ class DeckModel extends Sequelize.Model {
           type: DataTypes.TEXT,
           allowNull: true,
         },
+        learned_account_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         is_public: {
           type: DataTypes.BOOLEAN,
           allowNull: false,

@@ -32,6 +32,11 @@ class CoursesModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: 0,
         },
+        learned_account_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         is_public: {
           type: DataTypes.BOOLEAN,
           allowNull: false,

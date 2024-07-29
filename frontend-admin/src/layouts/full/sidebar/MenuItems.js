@@ -14,44 +14,34 @@ import { uniqueId } from 'lodash';
 const Menuitems = [
   {
     navlabel: true,
-    subheader: 'Home',
+    subheader: 'Thống kê',
   },
 
   {
     id: uniqueId(),
-    title: 'Dashboard',
+    title: 'Doanh thu',
     icon: IconLayoutDashboard,
     href: '/dashboard',
   },
   {
-    navlabel: true,
-    subheader: 'Utilities',
-  },
-  {
     id: uniqueId(),
-    title: 'Typography',
-    icon: IconTypography,
-    href: '/ui/typography',
-  },
-  {
-    id: uniqueId(),
-    title: 'Shadow',
-    icon: IconCopy,
-    href: '/ui/shadow',
+    title: 'Tài khoản',
+    icon: IconLogin,
+    href: '/accounts',
   },
   {
     navlabel: true,
-    subheader: 'Management',
+    subheader: 'Quản lý',
   },
   {
     id: uniqueId(),
-    title: 'Courses',
+    title: 'Khóa học',
     icon: IconCertificate,
     href: '/courses',
   },
   {
     id: uniqueId(),
-    title: 'Customer',
+    title: 'Khách hàng',
     icon: IconUserPlus,
     href: '/customers',
   },
@@ -61,22 +51,6 @@ const Menuitems = [
   //   icon: IconUserPlus,
   //   href: '/pro-plans',
   // },
-  {
-    navlabel: true,
-    subheader: 'Extra',
-  },
-  {
-    id: uniqueId(),
-    title: 'Icons',
-    icon: IconMoodHappy,
-    href: '/icons',
-  },
-  {
-    id: uniqueId(),
-    title: 'Sample Page',
-    icon: IconAperture,
-    href: '/sample-page',
-  },
 ];
 
 export default Menuitems;

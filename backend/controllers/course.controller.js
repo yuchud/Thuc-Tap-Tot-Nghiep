@@ -11,8 +11,8 @@ const requestMessageUtil = require('../utils/requestMessage.util');
 const courseController = {
   getAllCourses: async (req, res) => {
     try {
-      const { page, limit } = req.query;
-      const courses = await courseService.getAllCourses(+page, +limit);
+      const { page, limit, is_public, is_need_pro, search_query } = req.query;
+      const courses = await courseService.getAllCourses(+page, +limit, is_public, is_need_pro, search_query);
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {
       console.log(error);
@@ -21,8 +21,16 @@ const courseController = {
   },
   getAllPublicCourses: async (req, res) => {
     try {
-      const { page, limit, account_id } = req.query;
-      const courses = await courseService.getAllCourses(+page, +limit, true, account_id);
+      const { page, limit, is_need_pro, search_query, account_id, learning_state } = req.query;
+      const courses = await courseService.getAllCourses(
+        +page,
+        +limit,
+        true,
+        is_need_pro,
+        search_query,
+        account_id,
+        learning_state
+      );
       console.log(courses);
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {

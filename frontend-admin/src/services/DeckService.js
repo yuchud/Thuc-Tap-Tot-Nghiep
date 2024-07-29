@@ -2,10 +2,17 @@ import { BASE_API_URL } from '../constants/api';
 
 import http from 'http-status-codes';
 
-export const fetchGetDecksByCourseId = async (course_id, page = 1, limit = 12) => {
+export const fetchGetDecksByCourseId = async (
+  course_id,
+  page = 1,
+  limit = 12,
+  isPublicFilter = -1,
+  searchQuery = '',
+) => {
   try {
+    console.log('fsadfasdfasd', course_id, page, limit, isPublicFilter, searchQuery);
     const response = await fetch(
-      `${BASE_API_URL}/courses/${course_id}/decks?page=${page}&limit=${limit}`,
+      `${BASE_API_URL}/courses/${course_id}/decks?page=${page}&limit=${limit}&is_public=${isPublicFilter}&search_query=${searchQuery}`,
       {
         method: 'GET',
       },

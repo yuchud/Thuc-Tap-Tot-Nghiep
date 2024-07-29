@@ -23,6 +23,7 @@ import '../../../assets/css/modal-style.css';
 import '../../../assets/css/course-card.css';
 
 import Divider from '@mui/material/Divider';
+
 //import CourseTags from './CourseTags';
 import { useNavigate } from 'react-router';
 import Stack from '@mui/material/Stack';
@@ -35,7 +36,7 @@ import { fetchGetAccount } from '../../../services/AccountService';
 import LinearProgress from '@mui/material/LinearProgress';
 import Badge from '@mui/material/Badge';
 
-import formatDate from '../../../utilities/Date';
+import { formatDate } from '../../../utilities/Date';
 const CourseItem = ({ course }) => {
   const renderCardDescription = (description) => {
     if (description === null) return '';
@@ -116,12 +117,15 @@ const CourseItem = ({ course }) => {
             </Box>
             {course.last_reviewed_at && (
               <Box>
-                <Divider />
                 <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
                   Lần học cuối: {formatDate(course.last_reviewed_at)}
                 </Typography>
               </Box>
             )}
+            <hr />
+            <Typography variant="body2" color="text.secondary">
+              Số người học: {course.learned_account_count}
+            </Typography>
           </CardContent>
         </CardActionArea>
       </Card>

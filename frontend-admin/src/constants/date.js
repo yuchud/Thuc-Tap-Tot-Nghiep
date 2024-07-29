@@ -1,0 +1,1 @@
+export const BEGIN_DASHBOARD_YEAR = 2022;

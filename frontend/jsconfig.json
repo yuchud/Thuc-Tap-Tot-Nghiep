@@ -2,6 +2,6 @@
   "compilerOptions": {
     "baseUrl": "."
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../frontend-admin/src/services/DashboardService.js"],
   "exclude": ["node_modules"]
 }

@@ -1,4 +1,4 @@
-const formatDate = (date) => {
+export const formatDate = (date) => {
   const d = new Date(date);
   const year = d.getFullYear();
   const month = `${d.getMonth() + 1}`.padStart(2, '0');
@@ -9,4 +9,14 @@ const formatDate = (date) => {
   return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
 };
 
-export default formatDate;
+export const getCurrentYear = () => {
+  return new Date().getFullYear();
+};
+
+export const getCurrentMonth = () => {
+  return new Date().getMonth() + 1;
+};
+
+export const getCurrentDay = () => {
+  return new Date().getDate();
+};

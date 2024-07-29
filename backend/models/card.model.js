@@ -35,6 +35,11 @@ class CardModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: false,
         },
+        learned_account_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         deck_id: {
           type: DataTypes.INTEGER,
           allowNull: false,

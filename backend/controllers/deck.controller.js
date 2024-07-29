@@ -13,8 +13,8 @@ const CARD = require('../utils/props-and-objects.util').OBJECTS.CARD;
 const deckController = {
   getAllDecks: async (req, res) => {
     try {
-      const { page, limit } = req.query;
-      const decks = await deckService.getAllDecks(+page, +limit);
+      const { page, limit, is_public, search_query } = req.query;
+      const decks = await deckService.getAllDecks(+page, +limit, is_public, search_query);
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
@@ -42,8 +42,10 @@ const deckController = {
   getDecksByCourseId: async (req, res) => {
     const { id } = req.params;
     try {
-      const { page, limit } = req.query;
-      const decks = await deckService.getDecksByCourseId(id, +page, +limit);
+      const { page, limit, is_public, search_query } = req.query;
+      // console.log(page, limit, is_public, search_query);
+      console.log(page, limit, is_public, search_query);
+      const decks = await deckService.getDecksByCourseId(id, +page, +limit, is_public, search_query);
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);
@@ -54,8 +56,17 @@ const deckController = {
   getPublicDecksByCourseId: async (req, res) => {
     try {
       const { id } = req.params;
-      const { page, limit, account_id } = req.query;
-      const decks = await deckService.getDecksByCourseId(id, +page, +limit, true, account_id);
+      const { page, limit, search_query, account_id, learning_state } = req.query;
+      // console.log(page, limit, search_query, account_id, learning_state);
+      const decks = await deckService.getDecksByCourseId(
+        id,
+        +page,
+        +limit,
+        true,
+        search_query,
+        account_id,
+        learning_state
+      );
       res.status(http.StatusCodes.OK).json(decks);
     } catch (error) {
       console.log(error);

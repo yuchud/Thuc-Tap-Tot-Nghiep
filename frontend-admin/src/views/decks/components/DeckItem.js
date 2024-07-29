@@ -27,7 +27,7 @@ import { useNavigate } from 'react-router';
 import Stack from '@mui/material/Stack';
 
 import Chip from '@mui/material/Chip';
-import formatDate from '../../utilities/Date';
+import { formatDate } from '../../../utilities/Date';
 
 const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
   const CardActionsStyled = styled(CardActions)({
@@ -109,7 +109,8 @@ const DeckItem = ({ deck, onUpdateDeckClick, onDeleteDeckClick }) => {
           </BottomNavigation>
         </CardActionsStyled>
         <Box sx={{ m: 1 }}>
-          <Chip label={`${deck.card_count} thẻ`} />
+          <Chip label={`${deck.card_count} thẻ`} sx={{ mr: 1 }} />
+          <Chip label={`${deck.learned_account_count} người học`} />
           <Divider sx={{ m: 1 }} />
           <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
             Chỉnh sửa lần cuối: {formatDate(deck.updated_at)}

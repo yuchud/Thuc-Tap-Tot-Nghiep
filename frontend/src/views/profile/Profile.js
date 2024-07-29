@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Box, Button, Grid, Typography } from '@mui/material';
+import { Badge, Box, Button, Chip, Grid, Typography } from '@mui/material';
 import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
 import InputFileUpload from 'src/components/forms/theme-elements/InputFileUpload';
 import { fetchGetAccount, fetchUpdateAccount } from 'src/services/AccountService';
 
 import CustomSnackbar from 'src/components/snackbar/CustomSnackbar';
+import { formatDateOnly } from 'src/utilities/Date';
 const Profile = () => {
   const [avatar, setAvatar] = useState(null);
   const [previewAvatar, setPreviewAvatar] = useState(null);
@@ -14,6 +15,8 @@ const Profile = () => {
   const [lastName, setLastName] = useState('');
   const [birthday, setBirthday] = useState('');
   const [profile, setProfile] = useState(null);
+  const [isPro, setIsPro] = useState(false);
+  const [proExpiredAt, setProExpiredAt] = useState(null);
 
   const [usernameError, setUsernameError] = useState('');
 
@@ -91,6 +94,8 @@ const Profile = () => {
       setFirstName(profile.first_name);
       setLastName(profile.last_name);
       setBirthday(profile.birthday);
+      setIsPro(profile.is_pro);
+      setProExpiredAt(profile.pro_expired_at);
       setUsernameError('');
     }
   }, [profile]);
@@ -165,6 +170,12 @@ const Profile = () => {
             />
           </Grid>
         </Grid>
+        {isPro && (
+          <Box>
+            <Chip color="warning" label="Pro Version" sx={{ mt: 2 }} />
+            <Typography variant="h5">Ngày hết hạn Pro: {formatDateOnly(proExpiredAt)}</Typography>
+          </Box>
+        )}
         <Button type="submit" variant="contained" sx={{ mt: 3, mb: 2 }}>
           Xác nhận
         </Button>

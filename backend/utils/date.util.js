@@ -1,4 +1,4 @@
-const deckService = {
+const dateUtil = {
   getCurrentDateTime() {
     const date = new Date();
     const day = date.getDate();
@@ -19,6 +19,12 @@ const deckService = {
 
     return new Date(date.getTime() + milliseconds);
   },
+  getPreviousMonth: (year, month) => {
+    if (month == 1) {
+      return { year: year - 1, month: 12 };
+    }
+    return { year, month: month - 1 };
+  },
 };
 
-module.exports = deckService;
+module.exports = dateUtil;

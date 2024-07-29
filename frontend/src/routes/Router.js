@@ -24,6 +24,7 @@ const Password = Loadable(lazy(() => import('../views/profile/Password')));
 const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans')));
 const Flashcards = Loadable(lazy(() => import('../views/flashcard/Flashcards')));
 const Learnings = Loadable(lazy(() => import('../views/learning/Learning')));
+const ProHistories = Loadable(lazy(() => import('../views/proHistories/ProHistories')));
 const Router = [
   {
     path: '/',
@@ -69,6 +70,7 @@ const Router = [
     children: [
       { path: '/profile', element: <Profile /> },
       { path: '/profile/change-password', element: <Password /> },
+      { path: '/profile/pro-histories', element: <ProHistories /> },
     ],
   },
   {

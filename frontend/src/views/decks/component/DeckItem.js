@@ -12,7 +12,7 @@ import Divider from '@mui/material/Divider';
 import { useNavigate } from 'react-router';
 
 import CardActionArea from '@mui/material/CardActionArea';
-import formatDate from 'src/utilities/Date';
+import { formatDate } from 'src/utilities/Date';
 const CourseItem = ({ deck }) => {
   const navigate = useNavigate();
 
@@ -81,6 +81,10 @@ const CourseItem = ({ deck }) => {
                 </Typography>
               </Box>
             )}
+            <hr />
+            <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
+              Số người học: {deck.learned_account_count}
+            </Typography>
           </CardContent>
         </CardActionArea>
       </Card>

@@ -22,18 +22,20 @@ import { DEFAULT_COURSE_IMAGE } from 'src/constants/image';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import TextareaAutosize from '@mui/material/TextareaAutosize';
-import { toTitleCase } from '../utilities/stringUtils';
-import { isNameEmpty } from '../utilities/stringUtils';
-import { toSentenceCase } from '../utilities/stringUtils';
+import { toTitleCase } from '../../utilities/stringUtils';
+import { isNameEmpty } from '../../utilities/stringUtils';
+import { toSentenceCase } from '../../utilities/stringUtils';
 import DeleteConfirmModal from '../../components/modal/DeleteConfirmModal';
 import CustomSnackbar from '../../components/snackbar/CustomSnackbar';
 import CustomTextArea from '../../components/forms/theme-elements/CustomTextArea';
 
-import { useNavigate } from 'react-router';
+import { Select, MenuItem, InputLabel } from '@mui/material';
+
+import { useNavigate, useParams } from 'react-router';
 const Courses = () => {
   const [courses, setCourses] = React.useState([]);
   const [selectedCourse, setSelectedCourse] = React.useState({});
-  const [courseUpdated, setCourseUpdated] = React.useState(false);
+  // const [courseUpdated, setCourseUpdated] = React.useState(false);
   const [deletedCourseId, setDeletedCourseId] = React.useState(null);
 
   const [currentPage, setCurrentPage] = React.useState(0);
@@ -61,9 +63,19 @@ const Courses = () => {
   const [isPublic, setIsPublic] = React.useState(false);
   const [isNeedPro, setIsNeedPro] = React.useState(false);
 
+  const [searchQuery, setSearchQuery] = React.useState(useParams().search || '');
+  const [isPublicFilter, setIsPublicFilter] = React.useState(useParams().is_public || -1);
+  const [isNeedProFilter, setIsNeedProFilter] = React.useState(useParams().is_need_pro || -1);
+
   const navigate = useNavigate();
   const fetchCourses = async () => {
-    const fetchedCourses = await fetchGetAllCourses(currentPage, coursesPerPage);
+    const fetchedCourses = await fetchGetAllCourses(
+      currentPage,
+      coursesPerPage,
+      searchQuery,
+      isPublicFilter,
+      isNeedProFilter,
+    );
     if (fetchedCourses) {
       setCourses(fetchedCourses.courses);
       setTotalPages(fetchedCourses.totalPages);
@@ -229,6 +241,26 @@ const Courses = () => {
     setSnackbarOpen(false);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'isPublic') {
+      setIsPublicFilter(value);
+    } else if (name === 'isNeedPro') {
+      setIsNeedProFilter(value);
+    }
+  };
+
+  const handleSearchClick = () => {
+    const isPublic = isPublicFilter === -1 ? '' : isPublicFilter;
+    const isNeedPro = isNeedProFilter === -1 ? '' : isNeedProFilter;
+
+    navigate(`/courses?search_query=${searchQuery}&is_public=${isPublic}&is_need_pro=${isNeedPro}`);
+  };
+
   React.useEffect(() => {
     if (selectedCourse) {
       setName(selectedCourse.name);
@@ -251,6 +283,7 @@ const Courses = () => {
       return;
     }
     fetchCourses();
+    console.log(1);
   }, [currentPage]);
 
   const location = useLocation();
@@ -258,6 +291,7 @@ const Courses = () => {
     const searchParams = new URLSearchParams(location.search);
     const page = searchParams.get('page');
     setCurrentPage(page ? parseInt(page) : 1);
+    fetchCourses();
   }, [location]);
 
   return (
@@ -272,6 +306,54 @@ const Courses = () => {
           message={snackbarMessage}
           onClose={handleSnackbarClose}
         />
+        <Box>
+          <TextField
+            label="Tìm kiếm khóa học theo tên"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            variant="outlined"
+            fullWidth
+            margin="normal"
+          />
+          <FormControl margin="normal" sx={{ mr: 2 }}>
+            <InputLabel id="isPublic-label">Hiển thị</InputLabel>
+            <Select
+              labelId="isPublic-label"
+              id="isPublic"
+              name="isPublic"
+              value={isPublicFilter}
+              onChange={handleFilterChange}
+              label="Is Public"
+            >
+              <MenuItem value={-1}>Tất cả</MenuItem>
+              <MenuItem value={1}>Công khai</MenuItem>
+              <MenuItem value={0}>Riêng tư</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl margin="normal">
+            <InputLabel id="isNeedPro-label">Cần Pro?</InputLabel>
+            <Select
+              labelId="isNeedPro-label"
+              id="isNeedPro"
+              name="isNeedPro"
+              value={isNeedProFilter}
+              onChange={handleFilterChange}
+              label="Is Need Pro"
+            >
+              <MenuItem value={-1}>Tất cả</MenuItem>
+              <MenuItem value={1}>Cần Pro</MenuItem>
+              <MenuItem value={0}>Miễn phí</MenuItem>
+            </Select>
+          </FormControl>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSearchClick}
+            sx={{ ml: 2, mt: 2 }}
+          >
+            Tìm kiếm và lọc
+          </Button>
+        </Box>
         <Modal
           open={isModalOpen}
           course={selectedCourse}

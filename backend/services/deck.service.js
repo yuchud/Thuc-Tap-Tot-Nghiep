@@ -6,10 +6,18 @@ const { DEFAULT_DECK_IMAGE } = require('../config/app.config');
 const accountDeckDetailModel = require('../models/account-deck-detail.model');
 
 const deckService = {
-  getAllDecks: async (page = 1, limit = 12, is_public = null) => {
+  getAllDecks: async (page = 1, limit = 12, is_public = -1, search_query) => {
     try {
       const offset = (page - 1) * limit;
-      const whereClause = is_public === null ? {} : { is_public: is_public };
+      const whereClause = {};
+      if (is_public && is_public != -1) {
+        whereClause.is_public = is_public;
+      }
+
+      if (search_query) {
+        whereClause.name = { [sequelize.Op.like]: `%${search_query}%` };
+      }
+
       const { count, rows } = await deckModel.findAndCountAll({
         where: whereClause,
         limit: limit,
@@ -181,20 +189,41 @@ const deckService = {
       return error;
     }
   },
-  getDecksByCourseId: async (courseId, page = 1, limit = 12, is_public = null, account_id = null) => {
+  getDecksByCourseId: async (
+    courseId,
+    page = 1,
+    limit = 12,
+    is_public = -1,
+    search_query = null,
+    account_id = null,
+    learning_state = -1
+  ) => {
     try {
       if (page < 1) {
         page = 1;
       }
       const offset = (page - 1) * limit;
-      const whereClause = is_public === null ? { course_id: courseId } : { course_id: courseId, is_public: is_public };
-      const { count, rows } = await deckModel.findAndCountAll({
+      // console.log('getDecksByCourseId', courseId, page, limit, is_public, search_query, account_id, learning_state);
+      const whereClause = {};
+
+      if (is_public && is_public != -1) {
+        whereClause.is_public = is_public;
+      }
+
+      // console.log('search_query', search_query);
+      if (search_query) {
+        whereClause.name = { [sequelize.Op.like]: `%${search_query}%` };
+      }
+
+      whereClause.course_id = courseId;
+
+      let { count, rows } = await deckModel.findAndCountAll({
         where: whereClause,
         limit: limit,
         offset: offset,
       });
       if (account_id) {
-        const decksWithProgress = await Promise.all(
+        const filteredDecks = await Promise.all(
           rows.map(async (deck) => {
             const accountDeckDetail = await accountDeckDetailModel.findOne({
               where: {
@@ -207,10 +236,39 @@ const deckService = {
               ? (accountDeckDetail.learned_card_count / deck.card_count) * 100
               : 0;
             deck.dataValues.last_reviewed_at = accountDeckDetail ? accountDeckDetail.last_reviewed_at : null;
+
+            let isLearning = false;
+            let isLearned = false;
+
+            if (accountDeckDetail) {
+              if (accountDeckDetail.learned_card_count > 0 && accountDeckDetail.learned_card_count < deck.card_count) {
+                isLearning = true;
+              }
+              if (accountDeckDetail.learned_card_count == deck.card_count) {
+                isLearned = true;
+              }
+            }
+            deck.dataValues.isLearning = isLearning;
+            deck.dataValues.isLearned = isLearned;
             return deck;
           })
         );
+        rows = filteredDecks.filter((deck) => {
+          if (learning_state == -1) {
+            return true;
+          }
+          if (learning_state == 0) {
+            return !deck.dataValues.isLearning && !deck.dataValues.isLearned;
+          }
+          if (learning_state == 1) {
+            return deck.dataValues.isLearning;
+          }
+          if (learning_state == 2) {
+            return deck.dataValues.isLearned;
+          }
+        });
       }
+
       return {
         total: count,
         decks: rows,

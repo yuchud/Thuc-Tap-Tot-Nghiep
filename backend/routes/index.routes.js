@@ -9,9 +9,9 @@ const cardRoutes = require('./card.routes');
 const wordClassRoutes = require('./word-class.routes');
 const accountCardDetailRoutes = require('./account-card-detail.routes');
 const learningRoutes = require('./learning.routes');
-
+const purchaseHistoryRoutes = require('./purchase-history.routes');
+const dashboardRoutes = require('./dashboard.routes');
 const wordnikRoutes = require('./wordnik.routes');
-
 
 router.use('/accounts', accountRoutes);
 router.use('/decks', deckRoutes);
@@ -20,7 +20,9 @@ router.use('/courses', courseRoutes);
 router.use('/cards', cardRoutes);
 router.use('/word-classes', wordClassRoutes);
 router.use('/account-card-details', accountCardDetailRoutes);
+router.use('/purchase-histories', purchaseHistoryRoutes);
 router.use('/learning', learningRoutes);
+router.use('/dashboard', dashboardRoutes);
 router.use('/wordnik', wordnikRoutes);
 
 module.exports = router;

@@ -30,9 +30,9 @@ import { DEFAULT_DECK_IMAGE } from 'src/constants/image';
 import { FormControlLabel, Switch } from '@mui/material';
 import CustomSnackbar from '../../components/snackbar/CustomSnackbar';
 
-import { toTitleCase } from '../utilities/stringUtils';
-import { isNameEmpty } from '../utilities/stringUtils';
-import { toSentenceCase } from '../utilities/stringUtils';
+import { toTitleCase } from '../../utilities/stringUtils';
+import { isNameEmpty } from '../../utilities/stringUtils';
+import { toSentenceCase } from '../../utilities/stringUtils';
 
 import { fetchCreateCourse } from 'src/services/CourseService';
 
@@ -44,6 +44,8 @@ import Pagination from '@mui/material/Pagination';
 
 import { useLocation } from 'react-router-dom';
 import DeleteConfirmModal from 'src/components/modal/DeleteConfirmModal';
+
+import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
 const Decks = () => {
   // ** USE STATE ** //
@@ -82,6 +84,10 @@ const Decks = () => {
   const [totalPages, setTotalPage] = React.useState(1);
   const [currentPage, setCurrentPage] = React.useState(0);
   const [totalDecks, setTotalDecks] = React.useState(0);
+  const [decksPerPage, setDecksPerPage] = React.useState(12);
+  // Filter
+  const [searchQuery, setSearchQuery] = React.useState(useParams().search_query || '');
+  const [isPublicFilter, setIsPublicFilter] = React.useState(useParams().is_public || -1);
 
   const navigate = useNavigate();
 
@@ -99,7 +105,13 @@ const Decks = () => {
 
   const handleGetDecksByCourseId = async () => {
     try {
-      const deckData = await fetchGetDecksByCourseId(courseId, currentPage);
+      const deckData = await fetchGetDecksByCourseId(
+        courseId,
+        currentPage,
+        decksPerPage,
+        isPublicFilter,
+        searchQuery,
+      );
       if (deckData) {
         setDecks(deckData.decks);
         setTotalPage(deckData.totalPages);
@@ -136,17 +148,8 @@ const Decks = () => {
 
   // ** CREATE ** //
   const handleCreateDeckClick = () => {
-    // if (course.deck_count >= course.deck_limit) {
-    //   setSnackbarMessage('Số lượng bộ thẻ đã đạt giới hạn');
-    //   setSnackbarOpen(true);
-    //   setSnackbarSeverity('error');
-    //   return;
-    // }
     setIsModalOpen(true);
-    // setName('');
-    // setDescription('');
-    // setImage(DEFAULT_DECK_IMAGE);
-    // setPreviewImage(DEFAULT_DECK_IMAGE);
+
     setSelectedDeck(null);
     setModalSubmitName('Tạo bộ thẻ');
     setIsCreateMode(true);
@@ -265,6 +268,7 @@ const Decks = () => {
     setSelectedDeck(null);
     setIsNameValid(true);
     setNameError('');
+    resetModal();
   };
 
   // ** REFRESH DATA ** //
@@ -278,6 +282,24 @@ const Decks = () => {
     setDescription('');
     setImage(DEFAULT_DECK_IMAGE);
     setPreviewImage(DEFAULT_DECK_IMAGE);
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'isPublic') {
+      setIsPublicFilter(value);
+    }
+  };
+
+  const handleSearchClick = () => {
+    const isPublic = isPublicFilter === -1 ? '' : isPublicFilter;
+    console.log('fdsafkadsfldsafljasdjk', isPublic);
+
+    navigate(`/courses/${courseId}/decks?search_query=${searchQuery}&is_public=${isPublic}`);
   };
 
   // ** USE EFFECT ** //
@@ -306,6 +328,7 @@ const Decks = () => {
     const searchParams = new URLSearchParams(location.search);
     const page = searchParams.get('page');
     setCurrentPage(page ? parseInt(page) : 1);
+    refreshData();
   }, [location]);
 
   return (
@@ -376,7 +399,39 @@ const Decks = () => {
         message={snackbarMessage}
         onClose={() => setSnackbarOpen(false)}
       />
-
+      <Box>
+        <TextField
+          label="Tìm kiếm bộ thẻ theo tên"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        <FormControl margin="normal" sx={{ mr: 2 }}>
+          <InputLabel id="isPublic-label">Hiển thị</InputLabel>
+          <Select
+            labelId="isPublic-label"
+            id="isPublic"
+            name="isPublic"
+            value={isPublicFilter}
+            onChange={handleFilterChange}
+            label="Is Public"
+          >
+            <MenuItem value={-1}>Tất cả</MenuItem>
+            <MenuItem value={1}>Công khai</MenuItem>
+            <MenuItem value={0}>Riêng tư</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSearchClick}
+          sx={{ ml: 2, mt: 2 }}
+        >
+          Tìm kiếm và lọc
+        </Button>
+      </Box>
       <Box>
         <Modal
           open={isModalOpen}
@@ -391,7 +446,7 @@ const Decks = () => {
               open={snackbarOpen}
               severity={snackbarSeverity}
               message={snackbarMessage}
-              onClose={() => setSnackbarOpen(false)}
+              onClose={handleCloseModal}
             />
             <Typography variant="h6" id="modal-modal-title" sx={{ mt: 2 }}>
               {modalSubmitName}

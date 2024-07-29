@@ -10,6 +10,8 @@ import { fetchGetDecksByCourseId } from '../../services/DeskService';
 
 import { Card, CardContent, CardMedia, Divider, Grid, Typography } from '@mui/material';
 import { fetchGetCourseById } from 'src/services/CourseService';
+
+import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { set } from 'lodash';
 
 const Courses = () => {
@@ -22,9 +24,19 @@ const Courses = () => {
   const [coursesPerPage] = React.useState(12);
   const [totalPages, setTotalPages] = React.useState(0);
 
+  const [learningStateFilter, setLearningStateFilter] = React.useState(useParams().is_public || -1);
+  const [isNeedProFilter, setIsNeedProFilter] = React.useState(useParams().is_need_pro || -1);
+  const [searchQuery, setSearchQuery] = React.useState(useParams().search || '');
+
   const navigate = useNavigate();
   const handleFetchDecks = async () => {
-    const fetchedDecks = await fetchGetDecksByCourseId(courseId, currentPage);
+    const fetchedDecks = await fetchGetDecksByCourseId(
+      courseId,
+      currentPage,
+      coursesPerPage,
+      searchQuery,
+      learningStateFilter,
+    );
     if (fetchedDecks) {
       // console.log(fetchedDecks);
       setDecks(fetchedDecks.decks);
@@ -43,6 +55,24 @@ const Courses = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    if (name === 'learningState') {
+      setLearningStateFilter(value);
+    }
+  };
+
+  const handleSearchClick = () => {
+    const learningState = learningStateFilter == -1 ? '' : learningStateFilter;
+    navigate(
+      `/courses/${courseId}/decks?search_query=${searchQuery}&learning_state=${learningState}`,
+    );
+  };
+
   React.useEffect(() => {
     if (currentPage === 0) {
       setCurrentPage(Math.min(currentPage, totalPages));
@@ -57,6 +87,7 @@ const Courses = () => {
     const searchParams = new URLSearchParams(location.search);
     const page = searchParams.get('page');
     setCurrentPage(page ? parseInt(page) : 1);
+    handleFetchDecks();
   }, [location]);
 
   return (
@@ -101,6 +132,40 @@ const Courses = () => {
             </Card>
           </Grid>
         </Grid>
+      </Box>
+      <Box>
+        <TextField
+          label="Tìm kiếm khóa học theo tên"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+        />
+        <FormControl margin="normal">
+          <InputLabel id="learningState-label">Trạng thái học</InputLabel>
+          <Select
+            labelId="learningState-label"
+            id="learningState"
+            name="learningState"
+            value={learningStateFilter}
+            onChange={handleFilterChange}
+            label="Learning State"
+          >
+            <MenuItem value={-1}>Tất cả</MenuItem>
+            <MenuItem value={2}>Đã học</MenuItem>
+            <MenuItem value={1}>Đang học</MenuItem>
+            <MenuItem value={0}>Chưa học</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSearchClick}
+          sx={{ ml: 2, mt: 2 }}
+        >
+          Tìm kiếm và lọc
+        </Button>
       </Box>
       <Typography variant="h2" sx={{ textAlign: 'center', margin: '10px' }}>
         Đã học {course.learned_deck_count} / {course.deck_count} bộ thẻ

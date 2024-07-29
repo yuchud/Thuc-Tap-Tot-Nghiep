@@ -7,6 +7,7 @@ const sequelize = require('../db-connection');
 const DeckModel = require('../models/deck.model');
 const DateService = require('../utils/date.util');
 const CardModel = require('../models/card.model');
+const CoursesModel = require('../models/course.model');
 const WordClassModel = require('../models/word-class.model');
 
 const learningService = {
@@ -122,8 +123,8 @@ const learningService = {
           },
         });
         const isCardStudied = accountCardDetail !== null;
-        console.log('studiedCard', studiedCard);
-        //console.log('isCardStudied', isCardStudied);
+        // console.log('studiedCard', studiedCard);
+
         if (isCardStudied === false) {
           await AccountCardDetailModel.create(
             {
@@ -133,6 +134,17 @@ const learningService = {
               performance: studiedCard.performance,
             },
             { transaction }
+          );
+          await CardModel.update(
+            {
+              learned_account_count: sequelize.literal('learned_account_count + 1'),
+            },
+            {
+              where: {
+                id: studiedCard.id,
+              },
+              transaction,
+            }
           );
         } else {
           await AccountCardDetailModel.update(
@@ -185,6 +197,17 @@ const learningService = {
               last_reviewed_at: currentDateTime,
             },
             { transaction }
+          );
+          await DeckModel.update(
+            {
+              learned_account_count: sequelize.literal('learned_account_count + 1'),
+            },
+            {
+              where: {
+                id: deckId,
+              },
+              transaction,
+            }
           );
         } else {
           await AccountDeckDetailModel.update(
@@ -241,6 +264,17 @@ const learningService = {
               last_reviewed_at: currentDateTime,
             },
             { transaction }
+          );
+          await CoursesModel.update(
+            {
+              learned_account_count: sequelize.literal('learned_account_count + 1'),
+            },
+            {
+              where: {
+                id: courseID,
+              },
+              transaction,
+            }
           );
         } else {
           await AccountCourseDetailModel.update(
