@@ -19,6 +19,7 @@ const Profile = () => {
   const [proExpiredAt, setProExpiredAt] = useState(null);
 
   const [usernameError, setUsernameError] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -26,7 +27,8 @@ const Profile = () => {
 
   const handleGetProfile = async () => {
     const fetchedProfile = await fetchGetAccount();
-    console.log('fadff', profile);
+    // console.log('fadff', fetchedProfile);
+    // console.log('fadff', fetchedProfile.avatar_url === null);
     setProfile(fetchedProfile);
   };
 
@@ -39,6 +41,13 @@ const Profile = () => {
 
   const IsFormValid = () => {
     let IsFormValid = true;
+    setUsernameError('');
+    setEmailError('');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (email !== '' && !emailRegex.test(email)) {
+      setEmailError('Email không hợp lệ');
+      IsFormValid = false;
+    }
 
     if (username === '') {
       setUsernameError('Tên đăng nhập không được để trống');
@@ -88,12 +97,13 @@ const Profile = () => {
 
   React.useEffect(() => {
     if (profile) {
+      // console.log(profile);
       setPreviewAvatar(profile.avatar_url);
       setUsername(profile.username);
-      setEmail(profile.email);
-      setFirstName(profile.first_name);
-      setLastName(profile.last_name);
-      setBirthday(profile.birthday);
+      setEmail(profile.email ? profile.email : '');
+      setFirstName(profile.first_name ? profile.first_name : '');
+      setLastName(profile.last_name ? profile.last_name : '');
+      setBirthday(profile.birthday ? profile.birthday : '');
       setIsPro(profile.is_pro);
       setProExpiredAt(profile.pro_expired_at);
       setUsernameError('');
@@ -124,6 +134,8 @@ const Profile = () => {
           <Grid item xs={12} sm={6}>
             <CustomTextField
               required
+              id="username"
+              variant="outlined"
               fullWidth
               label="Tên đăng nhập"
               value={username}
@@ -139,6 +151,8 @@ const Profile = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               type="email"
+              error={emailError !== ''}
+              helperText={emailError}
             />
           </Grid>
           <Grid item xs={12} sm={6}>

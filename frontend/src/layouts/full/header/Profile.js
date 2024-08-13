@@ -124,7 +124,7 @@ const Profile = () => {
             fullWidth
             onClick={handleLogout}
           >
-            Logout
+            Đăng xuất
           </Button>
         </Box>
       </Menu>

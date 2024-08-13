@@ -36,9 +36,9 @@ const CourseItem = ({ deck }) => {
         sx={{
           maxWidth: 345,
           border:
-            deck.learned_card_count === deck.card_count
+            deck.learned_card_count === deck.public_card_count
               ? '2px solid green'
-              : deck.learned_card_count !== 0
+              : deck.public_card_count !== 0
               ? '2px solid orange'
               : '2px solid black',
         }}
@@ -71,7 +71,7 @@ const CourseItem = ({ deck }) => {
               sx={{ marginTop: '10px' }}
             />
             <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
-              {deck.learned_card_count} / {deck.card_count} thẻ đã học
+              {deck.learned_card_count} / {deck.public_card_count} thẻ đã học
             </Typography>
             {deck.last_reviewed_at && (
               <Box>

@@ -13,10 +13,11 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { fetchGetAllProPlans, fetchPurchaseProPlan } from 'src/services/ProPlanService';
 import { formatPrice } from 'src/utilities/Money';
+import { useNavigate } from 'react-router-dom';
 
 const ProPlans = () => {
   const [proPlans, setProPlans] = React.useState([]);
-
+  const isLoggedIn = localStorage.getItem('token') !== null;
   const handleGetAllProPlans = async () => {
     try {
       const fetchedProPlans = await fetchGetAllProPlans();
@@ -36,8 +37,12 @@ const ProPlans = () => {
       console.error('handleGetAllProPlans', error);
     }
   };
-
+  const navigate = useNavigate();
   const handleClickPurchase = (proPlanId) => async () => {
+    if (!isLoggedIn) {
+      navigate('/auth/login');
+      return;
+    }
     try {
       const response = await fetchPurchaseProPlan(proPlanId);
       if (response.hasOwnProperty('error')) {

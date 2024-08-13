@@ -19,15 +19,47 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   console.log('AuthLogin.js');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  const IsFormValid = () => {
+    let valid = true;
+    if (username === '') {
+      setUsernameError('Vui lòng nhập tên đăng nhập hoặc email');
+      valid = false;
+    } else {
+      setUsernameError('');
+    }
+    if (password === '') {
+      setPasswordError('Vui lòng nhập mật khẩu');
+      valid = false;
+    } else {
+      setPasswordError('');
+    }
+    return valid;
+  };
+
   const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (await !IsFormValid()) {
+      return;
+    }
     try {
       const response = await Login(username, password);
+      // console.log('response:', response);
+      if (!response.hasOwnProperty('token')) {
+        // console.log('response.error:', response.error);
+        setLoginError(response.message);
+        return;
+      }
+      console.log('response.token:', response.token);
       const token = response.token;
+
       localStorage.setItem('token', token);
       navigate('/');
-      //<Navigation to="/dashboard" />;
     } catch (error) {
       console.error('Error:', error);
     }
@@ -51,7 +83,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             htmlFor="username"
             mb="5px"
           >
-            Username
+            Tên đăng nhập / Email
           </Typography>
           <CustomTextField
             id="username"
@@ -60,6 +92,8 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
+            error={usernameError !== ''}
+            helperText={usernameError}
           />
         </Box>
         <Box mt="25px">
@@ -70,7 +104,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             htmlFor="password"
             mb="5px"
           >
-            Password
+            Mật khẩu
           </Typography>
           <CustomTextField
             id="password"
@@ -80,36 +114,35 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            error={passwordError !== ''}
+            helperText={passwordError}
           />
         </Box>
+        {loginError && (
+          <Typography color="error" variant="body2" mb={2}>
+            {loginError}
+          </Typography>
+        )}
         <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
-          <FormGroup>
+          {/* <FormGroup>
             <FormControlLabel control={<Checkbox defaultChecked />} label="Remeber this Device" />
-          </FormGroup>
+          </FormGroup> */}
           <Typography
             component={Link}
-            to="/"
+            to="/auth/reset-password"
             fontWeight="500"
             sx={{
               textDecoration: 'none',
               color: 'primary.main',
             }}
           >
-            Forgot Password ?
+            Quên mật khẩu?
           </Typography>
         </Stack>
       </Stack>
       <Box>
-        <Button
-          color="primary"
-          variant="contained"
-          size="large"
-          fullWidth
-          // component={Link}
-          // to="/"
-          type="submit"
-        >
-          Sign In
+        <Button color="primary" variant="contained" size="large" fullWidth type="submit">
+          Đăng nhập
         </Button>
       </Box>
       {subtitle}

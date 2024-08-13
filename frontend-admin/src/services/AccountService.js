@@ -2,11 +2,14 @@ import { BASE_API_URL } from 'src/constants/api';
 
 import http from 'http-status-codes';
 
-export const fetchGetAccounts = async (page = 1, limit = 10) => {
+export const fetchGetAccounts = async (page = 1, limit = 10, searchQuery) => {
   try {
-    const response = await fetch(`${BASE_API_URL}/accounts?page=${page}&limit=${limit}`, {
-      method: 'GET',
-    });
+    const response = await fetch(
+      `${BASE_API_URL}/accounts?page=${page}&limit=${limit}&search_query=${searchQuery}`,
+      {
+        method: 'GET',
+      },
+    );
     if (!response.ok) {
       if (response.status === http.BAD_REQUEST) {
         const errorData = await response.json();

@@ -6,10 +6,16 @@ const upload = multer({ dest: 'uploads/' });
 
 router.get('/', cardController.getAllCards);
 
-router.post('/', upload.single('file'), cardController.createCard);
-router.post('/upload', upload.single('file'), cardController.updateCard);
-
-router.put('/:id', upload.single('file'), cardController.updateCard);
+router.post(
+  '/',
+  upload.fields([{ name: 'front_image_file' }, { name: 'front_audio_file' }]),
+  cardController.createCard
+);
+router.put(
+  '/:id',
+  upload.fields([{ name: 'front_image_file' }, { name: 'front_audio_file' }]),
+  cardController.updateCard
+);
 
 router.delete('/:id', cardController.deleteCard);
 module.exports = router;

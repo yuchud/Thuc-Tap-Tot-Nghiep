@@ -5,9 +5,9 @@ import { Grid, Box, Card, Stack, Typography } from '@mui/material';
 // components
 import PageContainer from 'src/components/container/PageContainer';
 import Logo from 'src/layouts/full/shared/logo/Logo';
-import AuthLogin from './auth/AuthLogin';
+import AuthResetPassword from 'src/views/authentication/auth/AuthResetPassword';
 
-const Login2 = () => {
+const ResetPassword2 = () => {
   return (
     <PageContainer title="Login" description="this is Login page">
       <Box
@@ -40,30 +40,30 @@ const Login2 = () => {
               <Box display="flex" alignItems="center" justifyContent="center">
                 <Logo />
               </Box>
-              <AuthLogin
+              <AuthResetPassword
                 subtext={
                   <Typography variant="subtitle1" textAlign="center" color="textSecondary" mb={1}>
-                    Trang đăng nhập cho quản trị viên
+                    Lấy lại mật khẩu của bạn
                   </Typography>
                 }
-                // subtitle={
-                //   <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
-                //     <Typography color="textSecondary" variant="h6" fontWeight="500">
-                //       New to Modernize?
-                //     </Typography>
-                //     <Typography
-                //       component={Link}
-                //       to="/auth/register"
-                //       fontWeight="500"
-                //       sx={{
-                //         textDecoration: 'none',
-                //         color: 'primary.main',
-                //       }}
-                //     >
-                //       Create an account
-                //     </Typography>
-                //   </Stack>
-                // }
+                subtitle={
+                  <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
+                    <Typography color="textSecondary" variant="h6" fontWeight="400">
+                      Đã có tài khoản?
+                    </Typography>
+                    <Typography
+                      component={Link}
+                      to="/auth/login"
+                      fontWeight="500"
+                      sx={{
+                        textDecoration: 'none',
+                        color: 'primary.main',
+                      }}
+                    >
+                      Đăng nhập
+                    </Typography>
+                  </Stack>
+                }
               />
             </Card>
           </Grid>
@@ -73,4 +73,4 @@ const Login2 = () => {
   );
 };
 
-export default Login2;
+export default ResetPassword2;

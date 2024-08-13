@@ -4,6 +4,9 @@ import { Outlet } from 'react-router-dom';
 
 import Header from './header/Header';
 import Sidebar from './sidebar/Sidebar';
+import { useMediaQuery } from '@mui/material';
+import { Typography } from '@mui/material';
+import Link from '@mui/material/Link';
 
 console.log('token:', localStorage.getItem('token'));
 const MainWrapper = styled('div')(() => ({
@@ -72,6 +75,39 @@ const FullLayout = (props) => {
           {/* End Page */}
           {/* ------------------------------------------- */}
         </Container>
+        {/* ------------------------------------------- */}
+        {/* Footer */}
+        {/* ------------------------------------------- */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '60px',
+            backgroundColor: 'transparent',
+          }}
+        >
+          <Box
+            component="footer"
+            sx={{
+              py: 3,
+              px: 2,
+              mt: 'auto',
+              width: '100%',
+              textAlign: 'center',
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
+            }}
+          >
+            <Typography variant="body1">Nguyễn Đức Huy</Typography>
+            <Typography variant="body2">Telephone: 098-174-9633</Typography>
+            <Typography variant="body2">Email: dhuynguyen2002@gmail.com</Typography>
+            <Link href="https://www.facebook.com/HuyOoO228/" target="_blank" rel="noopener">
+              Facebook
+            </Link>
+          </Box>
+        </Box>
+        {/* ------------------------------------------- */}
       </PageWrapper>
     </MainWrapper>
   );

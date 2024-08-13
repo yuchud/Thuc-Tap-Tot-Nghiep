@@ -9,8 +9,9 @@ export const Login = async (usernameOrEmail, password) => {
       },
       body: JSON.stringify({ usernameOrEmail, password }),
     });
+    // console.log(response);
     if (!response.ok) {
-      throw new Error('Username or password is incorrect');
+      return { error: 'Tên đăng nhập / Email hoặc mật khẩu không đúng' };
     }
     return response.json();
   } catch (error) {
@@ -39,5 +40,6 @@ export const Login = async (usernameOrEmail, password) => {
 // };
 
 export const IsLoggedIn = () => {
+  // console.log(localStorage.getItem('token'));
   return localStorage.getItem('token') !== null;
 };

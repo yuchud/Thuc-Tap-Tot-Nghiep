@@ -12,6 +12,8 @@ import { fetchGetDeckById } from 'src/services/DeskService';
 import { fetchGetCardsToLearnByDeckId } from 'src/services/LearningService';
 
 import { fetchFinishLearning } from 'src/services/LearningService';
+import { fetchGetAudioById } from 'src/services/WordnikService';
+
 const Learning = () => {
   const { deckId } = useParams();
   const [cards, setCards] = useState([0]);
@@ -20,6 +22,8 @@ const Learning = () => {
   const [isFlipped, setIsFlipped] = useState(false);
   const [frontAudioUrl, setFrontAudioUrl] = useState('');
   const [LearnedCards, setLearnedCards] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const navigate = useNavigate();
 
   const handleGetDeck = async () => {
@@ -28,13 +32,16 @@ const Learning = () => {
   };
 
   const fetchCards = async () => {
+    setIsLoading(true);
     const fetchedCards = await fetchGetCardsToLearnByDeckId(deckId);
     setCards(fetchedCards || []);
+    setIsLoading(false);
   };
 
   const playAudio = (e) => {
     e.stopPropagation();
     const audio = new Audio(cards[currentIndex].front_audio_url);
+    console.log(cards[currentIndex].front_audio_url);
     audio.play();
   };
 
@@ -97,7 +104,11 @@ const Learning = () => {
   return (
     <Box>
       <h1>{deck.name}</h1>
-      {cards.length > 0 ? (
+      {isLoading ? (
+        <Typography variant="h3" component="div">
+          Đang tải thẻ...
+        </Typography>
+      ) : cards.length > 0 ? (
         <Box>
           {/* <Stack> */}
           <Box key={cards[currentIndex].id} className={`flashcard ${isFlipped ? 'flipped' : ''}`}>
@@ -125,15 +136,16 @@ const Learning = () => {
                   </CardContent>
                 </Card>
               </Box>
-              <Box className="back">
-                <Card>
-                  <CardContent>
-                    <Typography variant="h5" component="div">
-                      {cards[currentIndex].back_text}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
+              {/* <Box> */}
+              <Card className="back">
+                <CardContent>
+                  <Typography variant="h1" component="div">
+                    {/* flkdsajflkasdjklfadslkfkljas */}
+                    {cards[currentIndex].back_text}
+                  </Typography>
+                </CardContent>
+              </Card>
+              {/* </Box> */}
             </Box>
             <Button className="not-known-indicator" onClick={handleNotKnowCard}>
               Chưa nhớ từ này
@@ -149,7 +161,7 @@ const Learning = () => {
           {/* </Stack> */}
         </Box>
       ) : (
-        <p>Loading cards...</p>
+        <p>Không tìm thấy card</p>
       )}
     </Box>
   );

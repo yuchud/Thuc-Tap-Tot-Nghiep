@@ -4,9 +4,9 @@ import Loadable from '../layouts/full/shared/loadable/Loadable';
 import { isAdmin } from 'src/services/AuthService';
 import UserRoles from 'src/constants/UserRoles';
 import { ProtectedRoute, AuthProtectedRoute } from './ProtectedRoute';
-import { Home } from '@mui/icons-material';
-import About from 'src/views/about/About';
-import Contact from 'src/views/contact/Contact';
+// import { Home } from '@mui/icons-material';
+// import About from 'src/views/about/About';
+// import Contact from 'src/views/contact/Contact';
 
 /* ***Layouts**** */
 const BlankLayout = Loadable(lazy(() => import('../layouts/blank/BlankLayout')));
@@ -25,19 +25,23 @@ const ProPlans = Loadable(lazy(() => import('../views/proPlans/ProPlans')));
 const Flashcards = Loadable(lazy(() => import('../views/flashcard/Flashcards')));
 const Learnings = Loadable(lazy(() => import('../views/learning/Learning')));
 const ProHistories = Loadable(lazy(() => import('../views/proHistories/ProHistories')));
+const Home = Loadable(lazy(() => import('../views/home/Home')));
+const About = Loadable(lazy(() => import('../views/about/About')));
+const Contact = Loadable(lazy(() => import('../views/contact/Contact')));
+const ResetPassword = Loadable(lazy(() => import('../views/authentication/ResetPassword')));
 const Router = [
   {
     path: '/',
     element: <CustomerLayout />,
     children: [
       { path: '/', element: <Navigate to="/home" /> },
-      { path: '/home', element: <Home /> },
-      { path: '/about', element: <About /> },
+      { path: '/home', element: <Courses /> },
+      // { path: '/about', element: <About /> },
       { path: '/courses', element: <Courses /> },
       { path: '/courses/:courseId/decks', element: <Decks /> },
       { path: '/courses/:courseId/decks/:deckId/cards', element: <Cards /> },
-      { path: '/contact', element: <Contact /> },
-
+      // { path: '/contact', element: <Contact /> },
+      { path: '/pro-plans', element: <ProPlans /> },
       // { path: '/courses/:courseId/decks', element: <Decks /> },
       // { path: '/courses/:courseId/decks/:deckId/cards', element: <Cards /> },
       // { path: '/pro-plans', element: <ProPlans /> },
@@ -48,7 +52,7 @@ const Router = [
   },
   {
     path: '/',
-    element: <ProtectedRoute />,
+    element: <ProtectedRoute element={<CustomerLayout />} />,
     children: [
       // { path: '/', element: <Navigate to="/home" /> },
       // { path: '/home', element: <Home /> },
@@ -56,7 +60,6 @@ const Router = [
       // { path: '/contact', element: <Contact /> },
       // { path: '/courses', element: <Courses /> },
       { path: '/courses/:courseId/decks/:deckId/learning', element: <Learnings /> },
-      { path: '/pro-plans', element: <ProPlans /> },
       { path: '/about', element: <About /> },
       { path: '/password', element: <Password /> },
       { path: '/flashcards', element: <Flashcards /> },
@@ -66,7 +69,7 @@ const Router = [
   },
   {
     path: '/profile',
-    element: <ProfileLayout />,
+    element: <ProtectedRoute element={<ProfileLayout />} />,
     children: [
       { path: '/profile', element: <Profile /> },
       { path: '/profile/change-password', element: <Password /> },
@@ -80,6 +83,7 @@ const Router = [
       { path: '404', element: <Error /> },
       { path: '/auth/register', element: <Register /> },
       { path: '/auth/login', element: <Login /> },
+      { path: '/auth/reset-password', element: <ResetPassword /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

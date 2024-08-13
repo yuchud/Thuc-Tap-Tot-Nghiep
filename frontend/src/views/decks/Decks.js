@@ -14,6 +14,8 @@ import { fetchGetCourseById } from 'src/services/CourseService';
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { set } from 'lodash';
 
+import { Breadcrumbs, Link } from '@mui/material';
+import { IsLoggedIn } from 'src/services/AuthService';
 const Courses = () => {
   const account_id = localStorage.getItem('id');
   const courseId = useParams().courseId;
@@ -93,6 +95,22 @@ const Courses = () => {
   return (
     <Box>
       <Box>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            underline="hover"
+            color="inherit"
+            sx={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/courses');
+            }}
+          >
+            Khóa học
+          </Link>
+          <Typography color="text.primary">Bộ thẻ</Typography>
+        </Breadcrumbs>
+      </Box>
+      <Box>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={4} sx={{ display: { xs: 'none', sm: 'block' }, mb: 2 }}>
             <Card>
@@ -142,22 +160,24 @@ const Courses = () => {
           fullWidth
           margin="normal"
         />
-        <FormControl margin="normal">
-          <InputLabel id="learningState-label">Trạng thái học</InputLabel>
-          <Select
-            labelId="learningState-label"
-            id="learningState"
-            name="learningState"
-            value={learningStateFilter}
-            onChange={handleFilterChange}
-            label="Learning State"
-          >
-            <MenuItem value={-1}>Tất cả</MenuItem>
-            <MenuItem value={2}>Đã học</MenuItem>
-            <MenuItem value={1}>Đang học</MenuItem>
-            <MenuItem value={0}>Chưa học</MenuItem>
-          </Select>
-        </FormControl>
+        {IsLoggedIn() && (
+          <FormControl margin="normal">
+            <InputLabel id="learningState-label">Trạng thái học</InputLabel>
+            <Select
+              labelId="learningState-label"
+              id="learningState"
+              name="learningState"
+              value={learningStateFilter}
+              onChange={handleFilterChange}
+              label="Learning State"
+            >
+              <MenuItem value={-1}>Tất cả</MenuItem>
+              <MenuItem value={2}>Đã học</MenuItem>
+              <MenuItem value={1}>Đang học</MenuItem>
+              <MenuItem value={0}>Chưa học</MenuItem>
+            </Select>
+          </FormControl>
+        )}
         <Button
           variant="contained"
           color="primary"
@@ -167,9 +187,16 @@ const Courses = () => {
           Tìm kiếm và lọc
         </Button>
       </Box>
-      <Typography variant="h2" sx={{ textAlign: 'center', margin: '10px' }}>
-        Đã học {course.learned_deck_count} / {course.deck_count} bộ thẻ
-      </Typography>
+      {IsLoggedIn() ? (
+        <Typography variant="h2" sx={{ textAlign: 'center', margin: '10px' }}>
+          Đã học {course.learned_deck_count} / {course.public_deck_count} bộ thẻ
+        </Typography>
+      ) : (
+        <Typography variant="h2" sx={{ textAlign: 'center', margin: '10px' }}>
+          {course.public_deck_count} bộ thẻ
+        </Typography>
+      )}
+
       <CourseItems decks={decks}></CourseItems>
       <Pagination
         count={totalPages}

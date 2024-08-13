@@ -36,6 +36,18 @@ const wordnikService = {
       return error;
     }
   },
+  getAudioById: async (word, id) => {
+    try {
+      // console.log(231321);
+      const response = await wordnikService.getAudios(word);
+      // console.log(response);
+      const audio = response.find((audio) => audio.id == id);
+      // console.log(audio);
+      return audio.fileUrl;
+    } catch (error) {
+      return error;
+    }
+  },
 };
 
 module.exports = wordnikService;

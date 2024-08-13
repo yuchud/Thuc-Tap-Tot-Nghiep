@@ -30,7 +30,7 @@ export default function InputFileUpload({ title, onChange, name, onError, onErro
         startIcon={<CloudUploadIcon />}
       >
         {title}
-        <VisuallyHiddenInput type="file" onChange={onChange} name={name} />
+        <VisuallyHiddenInput type="file" accept="image/*" onChange={onChange} name={name} />
       </Button>
     </>
   );

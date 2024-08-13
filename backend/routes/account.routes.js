@@ -1,6 +1,8 @@
 const express = require('express');
 const accountController = require('../controllers/account.controller');
 const router = express.Router();
+const { sendOtpToEmail } = require('../services/otp.service');
+const { resetPasswordWithOTP } = require('../services/account.service');
 
 const multer = require('multer');
 const upload = multer({ dest: 'uploads/' });
@@ -17,4 +19,12 @@ router.put('/:id/password', accountController.updatePassword);
 router.put('/:id/toggle-banned', accountController.toggleAccountBannedStatus);
 
 router.delete('/:id', accountController.deleteAccount);
+
+router.post('/send-otp', async (req, res) => {
+  const { email } = req.body;
+  const otp = await sendOtpToEmail(email);
+  res.json(otp);
+});
+
+router.post('/reset-password', accountController.resetPasswordWithOTP);
 module.exports = router;

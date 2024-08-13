@@ -63,7 +63,7 @@ const Courses = () => {
   const [isPublic, setIsPublic] = React.useState(false);
   const [isNeedPro, setIsNeedPro] = React.useState(false);
 
-  const [searchQuery, setSearchQuery] = React.useState(useParams().search || '');
+  const [searchQuery, setSearchQuery] = React.useState(useParams().search_query || '');
   const [isPublicFilter, setIsPublicFilter] = React.useState(useParams().is_public || -1);
   const [isNeedProFilter, setIsNeedProFilter] = React.useState(useParams().is_need_pro || -1);
 

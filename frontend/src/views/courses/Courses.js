@@ -9,7 +9,7 @@ import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@m
 import { useParams } from 'react-router';
 const Courses = () => {
   const [courses, setCourses] = useState([]);
-
+  const isLoggined = localStorage.getItem('token') !== null;
   const [currentPage, setCurrentPage] = React.useState(0);
   const [coursesPerPage] = React.useState(12);
   const [totalPages, setTotalPages] = React.useState(0);
@@ -58,7 +58,7 @@ const Courses = () => {
       `/courses?is_need_pro=${isNeedPro}&search_query=${searchQuery}&learning_state=${learningState}`,
     );
   };
-  
+
   React.useEffect(() => {
     if (currentPage === 0) {
       setCurrentPage(1);
@@ -103,22 +103,25 @@ const Courses = () => {
             <MenuItem value={0}>Miễn phí</MenuItem>
           </Select>
         </FormControl>
-        <FormControl margin="normal">
-          <InputLabel id="learningState-label">Trạng thái học</InputLabel>
-          <Select
-            labelId="learningState-label"
-            id="learningState"
-            name="learningState"
-            value={learningStateFilter}
-            onChange={handleFilterChange}
-            label="Learning State"
-          >
-            <MenuItem value={-1}>Tất cả</MenuItem>
-            <MenuItem value={2}>Đã học</MenuItem>
-            <MenuItem value={1}>Đang học</MenuItem>
-            <MenuItem value={0}>Chưa học</MenuItem>
-          </Select>
-        </FormControl>
+        {isLoggined && (
+          <FormControl margin="normal">
+            <InputLabel id="learningState-label">Trạng thái học</InputLabel>
+            <Select
+              labelId="learningState-label"
+              id="learningState"
+              name="learningState"
+              value={learningStateFilter}
+              onChange={handleFilterChange}
+              label="Learning State"
+            >
+              <MenuItem value={-1}>Tất cả</MenuItem>
+              <MenuItem value={2}>Đã học</MenuItem>
+              <MenuItem value={1}>Đang học</MenuItem>
+              <MenuItem value={0}>Chưa học</MenuItem>
+            </Select>
+          </FormControl>
+        )}
+
         <Button
           variant="contained"
           color="primary"

@@ -1,9 +1,10 @@
 const deckModel = require('../models/deck.model');
 const courseModel = require('../models/course.model');
-const sequelize = require('sequelize');
+const sequelize = require('../db-connection');
 const azureStorage = require('../utils/azure-storage.util');
 const { DEFAULT_DECK_IMAGE } = require('../config/app.config');
 const accountDeckDetailModel = require('../models/account-deck-detail.model');
+const accountCourseDetailModel = require('../models/account-course-detail.model');
 
 const deckService = {
   getAllDecks: async (page = 1, limit = 12, is_public = -1, search_query) => {
@@ -49,7 +50,7 @@ const deckService = {
         });
         deck.dataValues.learned_card_count = accountDeckDetail ? accountDeckDetail.learned_card_count : 0;
         deck.dataValues.progress = accountDeckDetail
-          ? (accountDeckDetail.learned_card_count / deck.card_count) * 100
+          ? (accountDeckDetail.learned_card_count / deck.public_card_count) * 100
           : 0;
       }
       return deck;
@@ -124,12 +125,13 @@ const deckService = {
   },
 
   updateDeck: async ({ id, name, description, image, is_public }) => {
+    const transaction = await sequelize.transaction();
     try {
-      const deck = await deckModel.findByPk(id);
+      const deck = await deckModel.findByPk(id, { transaction });
       if (!deck) {
         return null;
       }
-      console.log('updateDeck', id, name, description, image, is_public);
+
       let imageUrl = null;
       if (image) {
         imageUrl = await azureStorage.uploadImage(
@@ -140,7 +142,8 @@ const deckService = {
       if (imageUrl === null) {
         imageUrl = imageUrl || deck.image_url;
       }
-      await deckModel.update(
+      const previousPublicStatus = Boolean(deck.is_public);
+      await deck.update(
         {
           name,
           description,
@@ -148,13 +151,52 @@ const deckService = {
           is_public,
           updated_at: new Date(),
         },
-        {
-          where: {
-            id: id,
-          },
-        }
+        { transaction }
       );
+
+      const currentPublicStatus = Boolean(deck.is_public);
+      // console.log('previousPublicStatus', previousPublicStatus);
+      // console.log('currentPublicStatus', currentPublicStatus);
+      if (previousPublicStatus !== currentPublicStatus) {
+        const accountsLearnedCards = await accountDeckDetailModel.findAll({
+          where: {
+            deck_id: id,
+          },
+          transaction,
+        });
+
+        const accountDeckDetail = await accountDeckDetailModel.findAll({
+          where: {
+            deck_id: id,
+            account_id: accountsLearnedCards.map((account) => account.account_id),
+          },
+          transaction,
+        });
+
+        const accountCourseDetail = await accountCourseDetailModel.findAll({
+          where: {
+            course_id: deck.course_id,
+            account_id: accountsLearnedCards.map((account) => account.account_id),
+          },
+          transaction,
+        });
+        console.log('accountCourseDetail', accountCourseDetail);
+        const course = await courseModel.findByPk(deck.course_id, { transaction });
+        if (currentPublicStatus) {
+          course.increment('public_deck_count', { by: 1 }, { transaction });
+          for (let i = 0; i < accountsLearnedCards.length; i++) {
+            accountCourseDetail[i].increment('learned_deck_count', { by: 1 }, { transaction });
+          }
+        } else {
+          course.decrement('public_deck_count', { by: 1 }, { transaction });
+          for (let i = 0; i < accountsLearnedCards.length; i++) {
+            accountCourseDetail[i].decrement('learned_deck_count', { by: 1 }, { transaction });
+          }
+        }
+      }
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       console.log(error);
       return error;
     }
@@ -217,10 +259,16 @@ const deckService = {
 
       whereClause.course_id = courseId;
 
+      // let orderClause = null;
+      // if (!account_id) {
+      //   orderClause = [['updated_at', 'DESC']];
+      // }
+
       let { count, rows } = await deckModel.findAndCountAll({
         where: whereClause,
         limit: limit,
         offset: offset,
+        // order: orderClause,
       });
       if (account_id) {
         const filteredDecks = await Promise.all(
@@ -233,7 +281,7 @@ const deckService = {
             });
             deck.dataValues.learned_card_count = accountDeckDetail ? accountDeckDetail.learned_card_count : 0;
             deck.dataValues.progress = accountDeckDetail
-              ? (accountDeckDetail.learned_card_count / deck.card_count) * 100
+              ? (accountDeckDetail.learned_card_count / deck.public_card_count) * 100
               : 0;
             deck.dataValues.last_reviewed_at = accountDeckDetail ? accountDeckDetail.last_reviewed_at : null;
 
@@ -241,10 +289,13 @@ const deckService = {
             let isLearned = false;
 
             if (accountDeckDetail) {
-              if (accountDeckDetail.learned_card_count > 0 && accountDeckDetail.learned_card_count < deck.card_count) {
+              if (
+                accountDeckDetail.learned_card_count > 0 &&
+                accountDeckDetail.learned_card_count < deck.public_card_count
+              ) {
                 isLearning = true;
               }
-              if (accountDeckDetail.learned_card_count == deck.card_count) {
+              if (accountDeckDetail.learned_card_count == deck.public_card_count) {
                 isLearned = true;
               }
             }

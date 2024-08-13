@@ -41,6 +41,7 @@ import DeleteConfirmModal from '../../components/modal/DeleteConfirmModal';
 
 import { Stack } from '@mui/material';
 import { fetchGetPronunciations, fetchGetAudios } from 'src/services/WordnikService';
+import { fetchGetAudioById } from 'src/services/WordnikService';
 
 const Cards = () => {
   const navigate = useNavigate();
@@ -65,6 +66,7 @@ const Cards = () => {
   const [isOpenDeleteModal, setIsOpenDeleteModal] = React.useState(false);
   const [isFrontPronunciationModalOpen, setIsFrontPronunciationModalOpen] = React.useState(false);
   const [isFrontAudioModalOpen, setIsFrontAudioModalOpen] = React.useState(false);
+  const [selectedFile, setSelectedFile] = React.useState(null);
 
   // card properties
   const [frontText, setFrontText] = React.useState('');
@@ -75,6 +77,7 @@ const Cards = () => {
   const [image, setImage] = React.useState('');
   const [previewImage, setPreviewImage] = React.useState('');
   const [isPublic, setIsPublic] = React.useState(false);
+  const [previewFrontAudio, setPreviewFrontAudioUrl] = React.useState('');
 
   const [pronunciations, setPronunciations] = React.useState([]);
   const [audios, setAudios] = React.useState([]);
@@ -234,6 +237,14 @@ const Cards = () => {
     setIsCreateMode(true);
   };
 
+  const handleFileChange = (e) => {
+    if (e.target.files.length) {
+      const audio = new Audio(URL.createObjectURL(e.target.files[0]));
+      setFrontAudioUrl(e.target.files[0]);
+      setPreviewFrontAudioUrl(audio.src);
+    }
+  };
+
   const handleCreateDeck = async (e) => {
     e.preventDefault();
     if (!isFormValid()) {
@@ -245,13 +256,16 @@ const Cards = () => {
     formData.append('back_text', backText);
     formData.append('word_class_id', wordClass);
     formData.append('deck_id', deckId);
-    formData.append('file', image);
     formData.append('is_public', isPublic);
     formData.append('front_pronunciation', frontPronunciation);
-    formData.append('front_audio_url', frontAudioUrl);
+    formData.append('front_image_file', image);
+    formData.append('front_audio_file', frontAudioUrl);
+
+    console.log(image, frontAudioUrl);
 
     try {
       const result = await fetchCreateCard(formData);
+
       if (result.hasOwnProperty('error')) {
         setSnackbarMessage(result.error);
         setIsSnackbarOpen(true);
@@ -274,16 +288,20 @@ const Cards = () => {
     if (!isFormValid()) {
       return;
     }
-
+    // console.log(frontAudioUrl);
+    // console.log(URL.createObjectURL(frontAudioUrl));
     const formData = new FormData();
     formData.append('front_text', frontText);
     formData.append('back_text', backText);
     formData.append('word_class_id', wordClass);
     formData.append('deck_id', deckId);
-    formData.append('file', image);
     formData.append('is_public', isPublic);
     formData.append('front_pronunciation', frontPronunciation);
-    formData.append('front_audio_url', frontAudioUrl);
+    formData.append('front_image_file', image);
+    formData.append('front_audio_file', frontAudioUrl);
+
+    console.log(image, frontAudioUrl);
+    // console.log(formData);
 
     try {
       const result = await fetchUpdateCard(selectedCard.id, formData);
@@ -370,9 +388,11 @@ const Cards = () => {
 
   // ** IMAGE ** //
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    setImage(file);
-    setPreviewImage(URL.createObjectURL(file));
+    if (e.target.files.length) {
+      const file = e.target.files[0];
+      setImage(file);
+      setPreviewImage(URL.createObjectURL(file));
+    }
   };
 
   // ** REFRESH DATA ** //
@@ -392,6 +412,7 @@ const Cards = () => {
     setImageError('');
     setTabValue('1');
     setFrontAudioUrl('');
+    setPreviewFrontAudioUrl('');
     setFrontPronunciation('');
     setWordClass(1);
     setIsPublic(false);
@@ -401,6 +422,19 @@ const Cards = () => {
   useEffect(() => {
     refreshData();
   }, []);
+
+  const handleGetAudioByID = async (word, id) => {
+    try {
+      const audio = await fetchGetAudioById(word, id);
+      if (audio) {
+        setFrontAudioUrl(audio);
+      }
+      // return audio;
+      // console.log(audio);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   React.useEffect(() => {
     if (selectedCard) {
@@ -412,6 +446,7 @@ const Cards = () => {
       setPreviewImage(selectedCard.front_image);
       setIsPublic(selectedCard.is_public);
       setFrontAudioUrl(selectedCard.front_audio_url);
+      setPreviewFrontAudioUrl(selectedCard.front_audio_url);
       setFrontPronunciation(selectedCard.front_pronunciation);
       setTabValue('1');
     } else {
@@ -572,7 +607,7 @@ const Cards = () => {
                       helperText={frontPronunciationError}
                     />
                     <Button onClick={() => setIsFrontPronunciationModalOpen(true)}>
-                      Chọn phiên âm
+                      Tự động tìm phiên âm
                     </Button>
                     <Modal
                       open={isFrontPronunciationModalOpen}
@@ -617,15 +652,20 @@ const Cards = () => {
                   <Box>
                     {/* Other component elements */}
                     {/* {frontAudioUrl && ( */}
+                    <Typography variant="h6" id="audio-modal-title" sx={{ mt: 2 }}>
+                      Audio phát âm
+                    </Typography>
+                    <input type="file" accept="audio/mpeg" onChange={handleFileChange} />
                     <Stack>
-                      <audio controls key={frontAudioUrl}>
-                        <source src={frontAudioUrl} type="audio/mpeg" />
+                      <audio controls key={previewFrontAudio}>
+                        <source src={previewFrontAudio} type="audio/mpeg" />
                         Your browser does not support the audio element.
                       </audio>
                     </Stack>
                     {/* )} */}
+
                     <Button onClick={() => setIsFrontAudioModalOpen(true)}>
-                      Chọn audio phát âm
+                      Tự động tìm audio phát âm
                     </Button>
                     <Modal
                       open={isFrontAudioModalOpen}
@@ -644,23 +684,24 @@ const Cards = () => {
                           </Typography>
                         ) : (
                           <Box>
-                            <Typography variant="h6" id="audio-modal-title" sx={{ mt: 2 }}>
-                              Chọn audio phát âm cho từ {frontText}
+                            <Typography variant="h2" id="audio-modal-title" sx={{ mt: 2 }}>
+                              Audio phát âm cho từ {frontText}
                             </Typography>
                             {audios.map((audio, index) => (
                               <Box key={index}>
                                 <audio controls>
                                   <source src={audio.fileUrl} type="audio/mpeg" />
                                 </audio>
-                                <Button
+                                {/* <Button
                                   onClick={() => {
                                     console.log(audio.fileUrl);
+                                    setFrontAudioId(audio.id);
                                     setFrontAudioUrl(audio.fileUrl);
                                     setIsFrontAudioModalOpen(false);
                                   }}
                                 >
                                   Chọn
-                                </Button>
+                                </Button> */}
                               </Box>
                             ))}
                           </Box>
@@ -737,6 +778,9 @@ const Cards = () => {
         </Typography> */}
           <Typography variant="h4" sx={{ mt: 2 }}>
             Số lượng thẻ: {deck.card_count} / {deck.card_limit}
+          </Typography>
+          <Typography variant="h4" sx={{ mt: 2 }}>
+            Số lượng thẻ công khai: {deck.public_card_count}
           </Typography>
           <Button
             variant="contained"

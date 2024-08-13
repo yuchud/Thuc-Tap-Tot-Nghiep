@@ -9,12 +9,13 @@ const DateService = require('../utils/date.util');
 const CardModel = require('../models/card.model');
 const CoursesModel = require('../models/course.model');
 const WordClassModel = require('../models/word-class.model');
+const wordnikService = require('./wordnik.service');
 
 const learningService = {
-  getCardsToStudyInDeck: async (accountID, deckID, limit = 2) => {
+  getCardsToStudyInDeck: async (accountID, deckID, limit = 8) => {
     // 1.get all cards in a deck
     const cards = await CardModel.findAll({
-      where: { deck_id: deckID },
+      where: { deck_id: deckID, is_public: true },
     });
 
     // console.log('cards', cards);
@@ -48,6 +49,7 @@ const learningService = {
     // 7. join 5 and 6 to get cards to study with word classes name
     return cardsToStudy.map((card) => {
       const wordClass = wordClasses.find((wordClass) => wordClass.id === card.word_class_id);
+
       return {
         ...card,
         word_class_name: wordClass ? wordClass.name : '',

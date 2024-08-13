@@ -44,13 +44,13 @@ const Login2 = () => {
               <AuthLogin
                 subtext={
                   <Typography variant="subtitle1" textAlign="center" color="textSecondary" mb={1}>
-                    Your Social Campaigns
+                    Học cùng Modernize
                   </Typography>
                 }
                 subtitle={
                   <Stack direction="row" spacing={1} justifyContent="center" mt={3}>
                     <Typography color="textSecondary" variant="h6" fontWeight="500">
-                      New to Modernize?
+                      Lần đầu biết đến Modernize?
                     </Typography>
                     <Typography
                       component={Link}
@@ -61,7 +61,7 @@ const Login2 = () => {
                         color: 'primary.main',
                       }}
                     >
-                      Create an account
+                      Tạo tài khoản
                     </Typography>
                   </Stack>
                 }

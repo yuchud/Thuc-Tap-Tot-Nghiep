@@ -4,18 +4,37 @@ const { hashPassword, comparePassword } = require('../utils/hashing.util');
 const appConfig = require('../config/app.config');
 const jwt = require('jsonwebtoken');
 const azureStorage = require('../utils/azure-storage.util');
+const io = require('../server').io;
+const { otpStore } = require('./otp.service');
+
 const accountService = {
-  getAllAccounts: async (page = 1, limit = 12) => {
+  getAllAccounts: async (page = 1, limit = 12, searchQuery) => {
     try {
       page = parseInt(page);
       limit = parseInt(limit);
+      if (page < 1) {
+        page = 1;
+      }
       const offset = (page - 1) * limit;
+      const whereClause = {};
+      // console.log(searchQuery);
+      if (searchQuery) {
+        whereClause[sequelize.Sequelize.Op.or] = [
+          { id: { [sequelize.Sequelize.Op.like]: `%${searchQuery}%` } },
+          { username: { [sequelize.Sequelize.Op.like]: `%${searchQuery}%` } },
+          { email: { [sequelize.Sequelize.Op.like]: `%${searchQuery}%` } },
+          { first_name: { [sequelize.Sequelize.Op.like]: `%${searchQuery}%` } },
+          { last_name: { [sequelize.Sequelize.Op.like]: `%${searchQuery}%` } },
+        ];
+      }
 
+      // console.log(whereClause);
       const { count, rows } = await accountModel.findAndCountAll({
         where: {
           account_role_id: {
             [sequelize.Sequelize.Op.not]: appConfig.USER_ROLE.ADMIN,
           },
+          ...whereClause,
         },
         limit: limit,
         offset: offset,
@@ -35,7 +54,7 @@ const accountService = {
 
   getAccountById: async (id) => {
     try {
-      return await accountModel.findOne({
+      const account = await accountModel.findOne({
         where: {
           id: id,
           account_role_id: {
@@ -44,6 +63,8 @@ const accountService = {
         },
         attributes: { exclude: ['password'] },
       });
+
+      return account;
     } catch (error) {
       console.error(error);
       return { error: error.message };
@@ -165,9 +186,13 @@ const accountService = {
       // const account_id = account.id;
       // const user = await accountService.getAccountById(account_id);
       // console.log(account.account_role_id);
-      const token = jwt.sign({ id: account.id, role: account.account_role_id }, appConfig.JWT_SECRET, {
-        expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s`,
-      });
+      const token = jwt.sign(
+        { id: account.id, role: account.account_role_id, is_banned: account.is_banned },
+        appConfig.JWT_SECRET,
+        {
+          expiresIn: `${appConfig.LOGIN_TOKEN_EXPIRATION}s`,
+        }
+      );
 
       return { message: 'Login successfully', token: token };
     } catch (error) {
@@ -177,6 +202,9 @@ const accountService = {
   },
   updateAccount: async (account_id, account, avatar) => {
     try {
+      // if (account.birthday === 'Invalid date') {
+      //   account.birthday = null;
+      // }
       let imageUrl = null;
       if (avatar) {
         imageUrl = await azureStorage.uploadImage(
@@ -191,7 +219,8 @@ const accountService = {
       }
       // console.log(account);
       account.updated_at = new Date();
-      console.log(account);
+      // console.log(account);
+      account.birthday = account.birthday ? account.birthday : null;
       const updatedAccount = await accountModel.update(account, {
         where: { id: account_id },
       });
@@ -229,12 +258,43 @@ const accountService = {
         }
         account.is_banned = !account.is_banned;
         await account.save();
+
+        // console.log(io);
+        io.emit('account_banned_status_changed', { account_id: account.id, is_banned: account.is_banned });
+        // io.emit('message', { message: 'Thay đổi trạng thái khóa tài khoản thành công' });
         resolve({ message: 'Thay đổi trạng thái khóa tài khoản thành công' });
       } catch (error) {
         console.error(error);
         reject({ error: error.message });
       }
     });
+  },
+  resetPasswordWithOTP: async (email, otp, newPassword) => {
+    try {
+      const storedOtp = otpStore[email];
+      // console.log(storedOtp);
+      otp = parseInt(otp);
+      if (!storedOtp) {
+        return { error: 'OTP không tồn tại hoặc đã hết hạn' };
+      }
+      console.log(storedOtp, otp);
+      if (storedOtp !== otp) {
+        return { error: 'OTP không chính xác' };
+      }
+
+      const account = await accountService.getAccountByUserNameOrEmail(email);
+
+      if (!account) {
+        return { error: 'Tài khoản không tồn tại' };
+      }
+      console.log(account);
+      await accountService.updatePassword(account.id, newPassword);
+
+      return { message: 'Đặt lại mật khẩu thành công' };
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
   },
 };
 module.exports = accountService;

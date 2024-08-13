@@ -102,7 +102,7 @@ const CourseItem = ({ course }) => {
                 sx={{ marginTop: '10px' }}
               />
               <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
-                {course.learned_deck_count} / {course.deck_count} bộ thẻ đã học
+                {course.learned_deck_count} / {course.public_deck_count} bộ thẻ đã học
               </Typography>
             </Box>
             <Box>
@@ -112,7 +112,7 @@ const CourseItem = ({ course }) => {
                 sx={{ marginTop: '10px' }}
               />
               <Typography variant="body2" color="text.secondary" sx={{ marginTop: '5px' }}>
-                {course.learned_card_count} / {course.card_count} thẻ đã học
+                {course.learned_card_count} / {course.public_card_count} thẻ đã học
               </Typography>
             </Box>
             {course.last_reviewed_at && (

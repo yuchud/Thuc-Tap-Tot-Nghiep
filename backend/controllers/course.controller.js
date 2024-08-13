@@ -31,7 +31,7 @@ const courseController = {
         account_id,
         learning_state
       );
-      console.log(courses);
+      // console.log(courses);
       res.status(http.StatusCodes.OK).json(courses);
     } catch (error) {
       console.log(error);
@@ -56,7 +56,7 @@ const courseController = {
   },
   createCourse: async (req, res) => {
     const { name, description, list } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     const image = req.file;
     try {
       if (!name.trim()) {

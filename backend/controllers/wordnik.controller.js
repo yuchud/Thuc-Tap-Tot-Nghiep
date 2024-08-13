@@ -7,9 +7,7 @@ const wordnikController = {
       const response = await wordnikService.getAudios(word);
       res.json(response);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   },
   getPronunciations: async (req, res) => {
@@ -18,9 +16,17 @@ const wordnikController = {
       const response = await wordnikService.getPronunciations(word);
       res.json(response);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ message: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
+    }
+  },
+  getAudioById: async (req, res) => {
+    const { word, id } = req.params;
+    // console.log(word, id);
+    try {
+      const response = await wordnikService.getAudioById(word, id);
+      res.json(response);
+    } catch (error) {
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: error.message });
     }
   },
 };

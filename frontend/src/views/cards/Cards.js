@@ -7,6 +7,8 @@ import { fetchGetDeckById } from '../../services/DeskService';
 import CardItems from './component/CardItems';
 
 import { Button } from '@mui/material';
+import { Breadcrumbs, Link } from '@mui/material';
+import { IsLoggedIn } from 'src/services/AuthService';
 const Cards = () => {
   const deckId = useParams().deckId;
   const [deck, setDeck] = React.useState({});
@@ -35,6 +37,33 @@ const Cards = () => {
   }, []);
   return (
     <Box>
+      <Box>
+        <Breadcrumbs aria-label="breadcrumb">
+          <Link
+            underline="hover"
+            color="inherit"
+            sx={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate('/courses');
+            }}
+          >
+            Khóa học
+          </Link>
+          <Link
+            underline="hover"
+            color="inherit"
+            sx={{ cursor: 'pointer' }}
+            onClick={(e) => {
+              e.preventDefault();
+              navigate(`/courses/${deck.course_id}/decks`);
+            }}
+          >
+            Bộ thẻ
+          </Link>
+          <Typography color="text.primary">Thẻ</Typography>
+        </Breadcrumbs>
+      </Box>
       <Box>
         <Grid container spacing={1}>
           <Grid item xs={12} sm={4} sx={{ display: { xs: 'none', sm: 'block' }, mb: 2 }}>
@@ -77,9 +106,13 @@ const Cards = () => {
         </Grid>
       </Box>
       <Box style={{ 'text-align': 'center' }}>
-        <Typography variant="h1">
-          Đã học {deck.learned_card_count} / {deck.card_count} thẻ
-        </Typography>
+        {IsLoggedIn() ? (
+          <Typography variant="h1">
+            Đã học {deck.learned_card_count} / {deck.public_card_count} thẻ
+          </Typography>
+        ) : (
+          <Typography variant="h1"> {deck.public_card_count} thẻ</Typography>
+        )}
         <Button
           variant="contained"
           color="primary"

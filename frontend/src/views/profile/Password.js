@@ -110,7 +110,7 @@ const Password = () => {
           {/* Submit Button */}
           <Grid item xs={12}>
             <Button type="submit" variant="contained" color="primary">
-              Save Changes
+              Đổi mật khẩu
             </Button>
           </Grid>
         </Grid>

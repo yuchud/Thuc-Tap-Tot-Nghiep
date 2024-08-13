@@ -16,14 +16,42 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
-  const [username, setUsername] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [usernameOrEmailError, setUsernameOrEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [loginError, setLoginError] = useState('');
   const navigate = useNavigate();
-  console.log('AuthLogin.js');
+  // console.log('AuthLogin.js');
+
+  const IsFormValid = () => {
+    if (usernameOrEmail === '') {
+      setUsernameOrEmailError('Vui lòng nhập tên đăng nhập hoặc email');
+      return false;
+    }
+    if (password === '') {
+      setPasswordError('Vui lòng nhập mật khẩu');
+      return false;
+    }
+    return true;
+  };
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!IsFormValid()) {
+      return;
+    }
     try {
-      const response = await Login(username, password);
+      setLoginError('');
+      const response = await Login(usernameOrEmail, password);
+      // console.log(usernameOrEmail, password);
+      // console.log(response);
+      if (!response.hasOwnProperty('token')) {
+        // console.log(response);
+        // console.log('Login successful');
+        setLoginError(response.error);
+        return;
+      }
+      // console.log(2);
       localStorage.setItem('token', response.token);
       navigate('/');
     } catch (error) {
@@ -49,15 +77,17 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             htmlFor="username"
             mb="5px"
           >
-            Username
+            Tên đăng nhập / Email
           </Typography>
           <CustomTextField
             id="username"
             variant="outlined"
             fullWidth
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={usernameOrEmail}
+            onChange={(e) => setUsernameOrEmail(e.target.value)}
             required
+            error={usernameOrEmailError !== ''}
+            helperText={usernameOrEmailError}
           />
         </Box>
         <Box mt="25px">
@@ -68,7 +98,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             htmlFor="password"
             mb="5px"
           >
-            Password
+            Mật khẩu
           </Typography>
           <CustomTextField
             id="password"
@@ -78,13 +108,20 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            error={passwordError !== ''}
+            helperText={passwordError}
           />
         </Box>
+        {loginError && (
+          <Typography color="error" variant="body2" mb={2}>
+            {loginError}
+          </Typography>
+        )}
         <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
           <FormGroup>
             <FormControlLabel control={<Checkbox defaultChecked />} label="Remeber this Device" />
           </FormGroup>
-          <Typography
+          {/* <Typography
             component={Link}
             to="/"
             fontWeight="500"
@@ -94,7 +131,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             }}
           >
             Forgot Password ?
-          </Typography>
+          </Typography> */}
         </Stack>
       </Stack>
       <Box>
@@ -107,7 +144,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
           //to="/"
           type="submit"
         >
-          Sign In
+          Đăng nhập
         </Button>
       </Box>
       {subtitle}

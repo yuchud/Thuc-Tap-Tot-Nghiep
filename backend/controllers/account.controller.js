@@ -6,14 +6,13 @@ const appConfig = require('../config/app.config');
 
 const accountController = {
   getAllAccounts: async (req, res) => {
-    const { page, limit } = req.query;
+    const { page, limit, search_query } = req.query;
+    // console.log(page, limit, searchQuery);
     try {
-      const accounts = await accountService.getAllAccounts(page, limit);
+      const accounts = await accountService.getAllAccounts(page, limit, search_query);
       res.status(http.StatusCodes.OK).json(accounts);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -24,44 +23,31 @@ const accountController = {
       if (account) {
         res.status(http.StatusCodes.OK).json(account);
       } else {
-        res
-          .status(http.StatusCodes.NOT_FOUND)
-          .json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
+        res.status(http.StatusCodes.NOT_FOUND).json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
       }
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
   createAccount: async (req, res) => {
     const account = req.body;
     try {
-      const isUsernameDuplicated = await accountService.isUsernameDuplicated(
-        account.username
-      );
+      console.log(account);
+      const isUsernameDuplicated = await accountService.isUsernameDuplicated(account.username);
       if (isUsernameDuplicated) {
-        res
-          .status(http.StatusCodes.BAD_REQUEST)
-          .json({ error: 'Username is already used' });
+        res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Tên đăng nhập đã được sử dụng' });
         return;
       }
-      const isEmailDuplicated = await accountService.isEmailDuplicated(
-        account.email
-      );
+      const isEmailDuplicated = await accountService.isEmailDuplicated(account.email);
       if (isEmailDuplicated) {
-        res
-          .status(http.StatusCodes.BAD_REQUEST)
-          .json({ error: 'Email is already used' });
+        res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Email đã được sử dụng' });
         return;
       }
       const result = await accountService.createAccount(account);
       res.status(http.StatusCodes.CREATED).json(result);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -70,15 +56,10 @@ const accountController = {
     const newPassword = req.body.password;
     // console.log(account_id, newPassword);
     try {
-      const result = await accountService.updatePassword(
-        account_id,
-        newPassword
-      );
+      const result = await accountService.updatePassword(account_id, newPassword);
       res.status(http.StatusCodes.OK).json(result);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -86,41 +67,33 @@ const accountController = {
     try {
       const usernameOrEmail = req.body.usernameOrEmail;
       const password = req.body.password;
-      const account = await accountService.getAccountByUserNameOrEmail(
-        usernameOrEmail
-      );
+      const account = await accountService.getAccountByUserNameOrEmail(usernameOrEmail);
       if (!account) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'Username or email not found' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Không tìm thấy Tên đăng nhập hoặc Email' });
         return;
       }
 
       if (account.account_role_id === appConfig.USER_ROLE.ADMIN) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'Username is already used' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Bạn không có quyền truy cập' });
         return;
       }
 
-      const isPasswordCorrect = await accountService.isPasswordCorrect(
-        password,
-        account.password
-      );
+      const isPasswordCorrect = await accountService.isPasswordCorrect(password, account.password);
 
       if (!isPasswordCorrect) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'Password is incorrect' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Sai mật khẩu' });
         return;
       }
-      // console.log(account);
+
+      if (account.is_banned) {
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Tài khoản của bạn đã bị khóa' });
+        return;
+      }
+
       const loginResult = await accountService.getToken(account);
       res.status(http.StatusCodes.OK).json(loginResult);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -128,40 +101,27 @@ const accountController = {
     try {
       const usernameOrEmail = req.body.usernameOrEmail;
       const password = req.body.password;
-      const account = await accountService.getAccountByUserNameOrEmail(
-        usernameOrEmail
-      );
+      const account = await accountService.getAccountByUserNameOrEmail(usernameOrEmail);
       if (!account) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'Username or email not found' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Không tìm thấy tên tài khoản hoặc email' });
         return;
       }
       if (account.account_role_id !== appConfig.USER_ROLE.ADMIN) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'You are not allowed to login here' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Bạn không có quyền đăng nhập ở đây' });
         return;
       }
 
-      const isPasswordCorrect = await accountService.isPasswordCorrect(
-        password,
-        account.password
-      );
+      const isPasswordCorrect = await accountService.isPasswordCorrect(password, account.password);
 
       if (!isPasswordCorrect) {
-        res
-          .status(http.StatusCodes.UNAUTHORIZED)
-          .json({ error: 'Password is incorrect' });
+        res.status(http.StatusCodes.UNAUTHORIZED).json({ message: 'Sai mật khẩu' });
         return;
       }
       // console.log(account.id);
       const loginResult = await accountService.getToken(account);
       res.status(http.StatusCodes.OK).json(loginResult);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   updateAccount: async (req, res) => {
@@ -169,30 +129,18 @@ const accountController = {
     const account = req.body;
     const avatar = req.file;
     try {
-      const isUsernameDuplicated = await accountService.isUsernameDuplicated(
-        account.username,
-        id
-      );
+      const isUsernameDuplicated = await accountService.isUsernameDuplicated(account.username, id);
       if (isUsernameDuplicated) {
-        return res
-          .status(http.StatusCodes.BAD_REQUEST)
-          .json({ message: 'Tên đăng nhập đã được sử dụng' });
+        return res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Tên đăng nhập đã được sử dụng' });
       }
-      const isEmailDuplicated = await accountService.isEmailDuplicated(
-        account.email,
-        id
-      );
+      const isEmailDuplicated = await accountService.isEmailDuplicated(account.email, id);
       if (isEmailDuplicated) {
-        return res
-          .status(http.StatusCodes.BAD_REQUEST)
-          .json({ message: 'Email đã được sử dụng' });
+        return res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Email đã được sử dụng' });
       }
       const result = await accountService.updateAccount(id, account, avatar);
       // console.log(result);
       if (result.error) {
-        res
-          .status(http.StatusCodes.NOT_FOUND)
-          .json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
+        res.status(http.StatusCodes.NOT_FOUND).json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
         return;
       }
       // console.log(newAccount);
@@ -200,9 +148,7 @@ const accountController = {
         message: 'Cập nhật thông tin tài khoản thành công',
       });
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 
@@ -211,16 +157,12 @@ const accountController = {
     try {
       const result = await accountService.deleteAccount(account_id);
       if (result.error) {
-        res
-          .status(http.StatusCodes.NOT_FOUND)
-          .json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
+        res.status(http.StatusCodes.NOT_FOUND).json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
         return;
       }
       res.status(http.StatusCodes.OK).json(result);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
   toggleAccountBannedStatus: async (req, res) => {
@@ -228,18 +170,36 @@ const accountController = {
     try {
       const result = await accountService.toggleAccountBannedStatus(account_id);
       if (result.error) {
-        res
-          .status(http.StatusCodes.NOT_FOUND)
-          .json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
+        res.status(http.StatusCodes.NOT_FOUND).json({ error: errorTypes.Account.ACCOUNT_NOT_FOUND });
         return;
       }
       res.status(http.StatusCodes.OK).json(result);
     } catch (error) {
-      res
-        .status(http.StatusCodes.INTERNAL_SERVER_ERROR)
-        .json({ error: error.message });
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  },
+  resetPasswordWithOTP : async (req, res) => {
+    const { email, otp, new_password } = req.body;
+    try {
+      const account = await accountService.getAccountByUserNameOrEmail(email);
+      if (!account) {
+        res.status(http.StatusCodes.BAD_REQUEST).json({ error: 'Tài khoản không tồn tại' });
+        return
+      }
+
+      
+      const result = await accountService.resetPasswordWithOTP(email, otp, new_password);
+      if (result.error) {
+        res.status(http.StatusCodes.BAD_REQUEST).json({ error: result.error });
+        return;
+      }
+      res.status(http.StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
 };
+
+
 
 module.exports = accountController;

@@ -95,7 +95,7 @@ const YearlyCreatedAcconts = ({ selectedYear }) => {
   }, [selectedYear]);
 
   return (
-    <DashboardCard title={`Doanh thu năm ${selectedYear}`}>
+    <DashboardCard title={`Số tài khoản tạo năm ${selectedYear}`}>
       <Grid container spacing={3}>
         {/* column */}
         <Grid item xs={7} sm={7}>

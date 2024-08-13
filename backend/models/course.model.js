@@ -27,7 +27,17 @@ class CoursesModel extends Sequelize.Model {
           allowNull: false,
           defaultValue: 0,
         },
+        public_deck_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         card_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
+        public_card_count: {
           type: DataTypes.INTEGER,
           allowNull: false,
           defaultValue: 0,

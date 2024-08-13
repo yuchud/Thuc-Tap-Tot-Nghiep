@@ -46,9 +46,9 @@ const Register2 = () => (
               subtitle={
                 <Stack direction="row" justifyContent="center" spacing={1} mt={3}>
                   <Typography color="textSecondary" variant="h6" fontWeight="400">
-                    Already have an Account?
+                    Đã có tài khoản?
                   </Typography>
-                  <Typography 
+                  <Typography
                     component={Link}
                     to="/auth/login"
                     fontWeight="500"
@@ -57,7 +57,7 @@ const Register2 = () => (
                       color: 'primary.main',
                     }}
                   >
-                    Sign In
+                    Đăng nhập
                   </Typography>
                 </Stack>
               }

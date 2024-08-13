@@ -74,13 +74,15 @@ const proPlansService = {
       }
 
       const currentDate = new Date();
-      let pro_expired_at = account.pro_expired_at;
+      let pro_expired_at = new Date(account.pro_expired_at);
+      // console.log(pro_expired_at, currentDate, pro_expired_at > currentDate);
       if (pro_expired_at > currentDate) {
-        pro_expired_at = addMonth(account.pro_expired_at, proPlan.month_count);
+        pro_expired_at = addMonth(pro_expired_at, proPlan.month_count);
       } else {
         pro_expired_at = addMonth(currentDate, proPlan.month_count);
       }
-      console.log(pro_expired_at);
+
+      // console.log(pro_expired_at);
       await account.update(
         {
           is_pro: true,
@@ -103,6 +105,7 @@ const proPlansService = {
       await transaction.commit();
       return true;
     } catch (error) {
+      console.log(error);
       await transaction.rollback();
       throw new Error(error.message);
     }

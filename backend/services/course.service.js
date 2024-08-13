@@ -31,10 +31,15 @@ const courseService = {
       if (searchQuery) {
         whereClause.name = { [Op.like]: `%${searchQuery}%` };
       }
+      // let orderClause = null;
+      // if (!accountId) {
+      //   orderClause = [['updated_at', 'DESC']];
+      // }
       let { count, rows } = await courseModel.findAndCountAll({
         where: whereClause,
         limit: limit,
         offset: offset,
+        // order: orderClause,
       });
       if (accountId) {
         const filteredCourse = await Promise.all(
@@ -48,10 +53,10 @@ const courseService = {
             course.dataValues.learned_deck_count = accountCourseDetail ? accountCourseDetail.learned_deck_count : 0;
             course.dataValues.learned_card_count = accountCourseDetail ? accountCourseDetail.learned_card_count : 0;
             course.dataValues.deck_progress = accountCourseDetail
-              ? (accountCourseDetail.learned_deck_count / course.deck_count) * 100
+              ? (accountCourseDetail.learned_deck_count / course.public_deck_count) * 100
               : 0;
             course.dataValues.card_progress = accountCourseDetail
-              ? (accountCourseDetail.learned_card_count / course.card_count) * 100
+              ? (accountCourseDetail.learned_card_count / course.public_card_count) * 100
               : 0;
             course.dataValues.last_reviewed_at = accountCourseDetail ? accountCourseDetail.last_reviewed_at : null;
 
@@ -118,10 +123,10 @@ const courseService = {
         course.dataValues.learned_deck_count = accountCourseDetail ? accountCourseDetail.learned_deck_count : 0;
         course.dataValues.learned_card_count = accountCourseDetail ? accountCourseDetail.learned_card_count : 0;
         course.dataValues.deck_progress = accountCourseDetail
-          ? (accountCourseDetail.learned_deck_count / course.deck_count) * 100
+          ? (accountCourseDetail.learned_deck_count / course.public_deck_count) * 100
           : 0;
         course.dataValues.card_progress = accountCourseDetail
-          ? (accountCourseDetail.learned_card_count / course.card_count) * 100
+          ? (accountCourseDetail.learned_card_count / course.public_card_count) * 100
           : 0;
       }
       return course;

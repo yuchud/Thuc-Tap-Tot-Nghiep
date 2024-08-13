@@ -43,19 +43,19 @@ const Header = (props) => {
           <Logo />
         </Box>
         <Stack spacing={1} direction="row" alignItems="center">
-          <HeaderButton color="primary" href="/home">
+          <HeaderButton color="primary" href="/home" sx={{ fontWeight: 800 }}>
             Trang chủ
           </HeaderButton>
-          <HeaderButton color="primary" href="/courses">
+          <HeaderButton color="primary" href="/courses" sx={{ fontWeight: 800 }}>
             Khóa Học
           </HeaderButton>
-          <HeaderButton color="primary" href="/about">
+          {/* <HeaderButton color="primary" href="/about" sx={{ fontWeight: 800 }}>
             Giới thiệu
-          </HeaderButton>
-          <HeaderButton color="primary" href="/contact">
+          </HeaderButton> */}
+          {/* <HeaderButton color="primary" href="/contact" sx={{ fontWeight: 800 }}>
             Liên hệ
-          </HeaderButton>
-          <HeaderButton color="primary" href="/pro-plans">
+          </HeaderButton> */}
+          <HeaderButton color="primary" href="/pro-plans" sx={{ fontWeight: 800 }}>
             Gói Pro
           </HeaderButton>
         </Stack>
@@ -76,7 +76,7 @@ const Header = (props) => {
         )} */}
         <Box flexGrow={1} />
         {!isLogin && <RightGroupHeader />}
-        {isLogin && <LoginRightGroupHeader />};
+        {isLogin && <LoginRightGroupHeader />}
       </ToolbarStyled>
     </AppBarStyled>
   );
