@@ -25,8 +25,22 @@ const proPlanExpirationJob = {
   },
 };
 
-// Run the job every day at midnight
-// minute hour day month dayOfWeek
+checkProPlanExpired: async() => {
+  try {
+    const currentDate = new Date();
+    const expiredAccounts = await AccountModel.findAll({
+      where: {
+        pro_expired_at: {
+          [Op.lte]: currentDate,
+        },
+        is_pro: true,
+      },
+    });
+  }
+  catch (error) {
+    console.error(error);
+  }
+}
 cron.schedule('0 0 * * *', async () => {
   proPlanExpirationJob.checkProPlanExpiration();
 });

@@ -17,6 +17,7 @@ const models = {
   CardModel: require('./models/card.model').init(sequelize),
   WordClassModel: require('./models/word-class.model').init(sequelize),
   PurchaseHistoryModel: require('./models/purchase-history.model').init(sequelize),
+  NotificationModel: require('./models/notification.model').init(sequelize),
 
   AccountCourseDetailModel: require('./models/account-course-detail.model').init(sequelize),
   AccountDeckDetailModel: require('./models/account-deck-detail.model').init(sequelize),

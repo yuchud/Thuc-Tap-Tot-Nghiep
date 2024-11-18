@@ -59,21 +59,6 @@ const Header = (props) => {
             Gói Pro
           </HeaderButton>
         </Stack>
-        {/* {props.isAdmin && (
-          <IconButton
-            color="inherit"
-            aria-label="menu"
-            onClick={props.toggleMobileSidebar}
-            sx={{
-              display: {
-                lg: 'none',
-                xs: 'inline',
-              },
-            }}
-          >
-            <IconMenu width="20" height="20" />
-          </IconButton>
-        )} */}
         <Box flexGrow={1} />
         {!isLogin && <RightGroupHeader />}
         {isLogin && <LoginRightGroupHeader />}

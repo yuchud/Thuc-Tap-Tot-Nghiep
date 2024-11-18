@@ -20,10 +20,11 @@ const LoginRightGroupHeader = () => {
             color: 'primary.main',
           }),
         }}
+        href="/notifications"
       >
-        {/* <Badge variant="dot" color="primary">
+        <Badge variant="dot" color="primary">
           <IconBellRinging size="21" stroke="1.5" />
-        </Badge> */}
+        </Badge>
       </IconButton>
       <Profile />
     </Stack>

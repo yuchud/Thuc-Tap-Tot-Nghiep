@@ -28,6 +28,7 @@ const ProHistories = Loadable(lazy(() => import('../views/proHistories/ProHistor
 const Home = Loadable(lazy(() => import('../views/home/Home')));
 const About = Loadable(lazy(() => import('../views/about/About')));
 const Contact = Loadable(lazy(() => import('../views/contact/Contact')));
+const Notification = Loadable(lazy(() => import('../views/notifications/Notifications')));
 const ResetPassword = Loadable(lazy(() => import('../views/authentication/ResetPassword')));
 const Router = [
   {
@@ -47,6 +48,7 @@ const Router = [
       // { path: '/pro-plans', element: <ProPlans /> },
       // { path: '/profile', element: <Profile /> },
       // { path: '/password', element: <Password /> },
+      { path: '/notifications', element: <Notification /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },
