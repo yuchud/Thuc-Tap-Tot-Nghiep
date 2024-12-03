@@ -46,6 +46,10 @@
   color: #888;
 }
 
+.notification-message {
+  white-space: pre-line;
+}
+
 .main-screen {
   flex: 1;
   padding: 20px;

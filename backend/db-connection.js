@@ -18,6 +18,8 @@ const models = {
   WordClassModel: require('./models/word-class.model').init(sequelize),
   PurchaseHistoryModel: require('./models/purchase-history.model').init(sequelize),
   NotificationModel: require('./models/notification.model').init(sequelize),
+  LearnStreakModel: require('./models/learn-streak.model').init(sequelize),
+  WeeklyLearnTrackerModel: require('./models/weekly-learn-tracker.model').init(sequelize),
 
   AccountCourseDetailModel: require('./models/account-course-detail.model').init(sequelize),
   AccountDeckDetailModel: require('./models/account-deck-detail.model').init(sequelize),

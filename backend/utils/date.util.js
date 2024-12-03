@@ -10,7 +10,7 @@ const dateUtil = {
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   },
   addMonth: (date, months) => {
-    console.log(date);
+    //console.log(date);
     const days = months * 30;
     const hours = days * 24;
     const minutes = hours * 60;
@@ -24,6 +24,10 @@ const dateUtil = {
       return { year: year - 1, month: 12 };
     }
     return { year, month: month - 1 };
+  },
+  getCurrentDayOfWeek: () => {
+    const date = new Date();
+    return date.getDay() == 0 ? 7 : date.getDay();
   },
 };
 

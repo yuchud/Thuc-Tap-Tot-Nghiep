@@ -13,6 +13,7 @@ const purchaseHistoryRoutes = require('./purchase-history.routes');
 const dashboardRoutes = require('./dashboard.routes');
 const notificationRoutes = require('./notification.routes');
 const wordnikRoutes = require('./wordnik.routes');
+const vnpayRoutes = require('./vnpay.routes');
 
 router.use('/accounts', accountRoutes);
 router.use('/decks', deckRoutes);
@@ -26,5 +27,6 @@ router.use('/learning', learningRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/wordnik', wordnikRoutes);
+router.use('/vnpay', vnpayRoutes);
 
 module.exports = router;

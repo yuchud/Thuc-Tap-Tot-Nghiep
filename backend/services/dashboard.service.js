@@ -4,6 +4,7 @@ const sequelize = require('sequelize');
 const dateUtil = require('../utils/date.util');
 const ProPlansModel = require('../models/pro-plan.model');
 const AccountsModel = require('../models/account.model');
+const LearnStreak = require('../models/learn-streak.model');
 
 const DashboardService = {
   getRevenueDailyInMonth: async (year, month) => {
@@ -356,6 +357,90 @@ const DashboardService = {
         order: [[sequelize.fn('DAY', sequelize.col('created_at'))]],
       });
       return accounts;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  },
+  getTopCurrentLearnStreaks: async (top) => {
+    try {
+      if (top === undefined) {
+        top = 10;
+      }
+
+      const streaks = await LearnStreak.findAll({
+        attributes: ['account_id', [sequelize.literal('current_learned_day_streak'), 'value']],
+        order: [['current_learned_day_streak', 'DESC']],
+        limit: top,
+      });
+
+      const streaksWithFullname = await Promise.all(
+        streaks.map(async (streak, index) => {
+          const account = await AccountsModel.findByPk(streak.account_id);
+          const full_name = account.last_name + ' ' + account.first_name;
+          return {
+            rank: index + 1,
+            ...streak.toJSON(),
+            full_name: full_name === 'null null' ? 'Vô danh' : full_name,
+          };
+        })
+      );
+      return streaksWithFullname;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  },
+  getTopLongestLearnStreaks: async (top) => {
+    try {
+      if (top === undefined) {
+        top = 10;
+      }
+      const streaks = await LearnStreak.findAll({
+        attributes: ['account_id', [sequelize.literal('longest_learned_day_streak'), 'value']],
+        order: [['longest_learned_day_streak', 'DESC']],
+        limit: top,
+      });
+      const streaksWithFullname = await Promise.all(
+        streaks.map(async (streak, index) => {
+          const account = await AccountsModel.findByPk(streak.account_id);
+          const full_name = account.last_name + ' ' + account.first_name;
+          return {
+            rank: index + 1,
+            ...streak.toJSON(),
+            full_name: full_name === 'null null' ? 'Vô danh' : full_name,
+          };
+        })
+      );
+      return streaksWithFullname;
+    } catch (error) {
+      console.error(error);
+      return error;
+    }
+  },
+  getTopLearnedCardsCount: async (top) => {
+    try {
+      if (top === undefined) {
+        top = 10;
+      }
+      const topLearnedCardsCount = await AccountsModel.findAll({
+        attributes: ['id', [sequelize.literal('learned_card_count'), 'value'], 'last_name', 'first_name'],
+        order: [['learned_card_count', 'DESC']],
+        where: { learned_card_count: { [Op.gt]: 0 } },
+        limit: top,
+      });
+      const topLearnedCardsCountWithFullname = await Promise.all(
+        topLearnedCardsCount.map(async (data, index) => {
+          const full_name = data.last_name + ' ' + data.first_name;
+          return {
+            rank: index + 1,
+            ...data.toJSON(),
+            full_name: full_name === 'null null' ? 'Vô danh' : full_name,
+          };
+        })
+      );
+
+      return topLearnedCardsCountWithFullname;
     } catch (error) {
       console.error(error);
       return error;

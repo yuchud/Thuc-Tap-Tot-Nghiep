@@ -178,16 +178,15 @@ const accountController = {
       res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
-  resetPasswordWithOTP : async (req, res) => {
+  resetPasswordWithOTP: async (req, res) => {
     const { email, otp, new_password } = req.body;
     try {
       const account = await accountService.getAccountByUserNameOrEmail(email);
       if (!account) {
         res.status(http.StatusCodes.BAD_REQUEST).json({ error: 'Tài khoản không tồn tại' });
-        return
+        return;
       }
 
-      
       const result = await accountService.resetPasswordWithOTP(email, otp, new_password);
       if (result.error) {
         res.status(http.StatusCodes.BAD_REQUEST).json({ error: result.error });
@@ -198,8 +197,33 @@ const accountController = {
       res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
     }
   },
+  getAccountWeeklyLearnTracker: async (req, res) => {
+    const account_id = req.params.id;
+    try {
+      const result = await accountService.getAccountWeeklyLearnTracker(account_id);
+      res.status(http.StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  },
+  getAccountLearnStreak: async (req, res) => {
+    const account_id = req.params.id;
+    try {
+      const result = await accountService.getAccountLearnStreak(account_id);
+      res.status(http.StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  },
+  getAccountLearnedCardsCount: async (req, res) => {
+    const account_id = req.params.id;
+    try {
+      const result = await accountService.getAccountLearnedCardsCount(account_id);
+      res.status(http.StatusCodes.OK).json(result);
+    } catch (error) {
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ error: error.message });
+    }
+  },
 };
-
-
 
 module.exports = accountController;

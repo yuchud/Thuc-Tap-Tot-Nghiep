@@ -113,6 +113,36 @@ const dashboardController = {
       return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   },
+  getTopCurrentLearnStreaks: async (req, res) => {
+    try {
+      const { top } = req.query;
+      const streaks = await dashboardService.getTopCurrentLearnStreaks(top);
+      return res.status(http.StatusCodes.OK).json(streaks);
+    } catch (error) {
+      console.error(error);
+      return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
+  getTopLongestLearnStreaks: async (req, res) => {
+    try {
+      const { top } = req.query;
+      const streaks = await dashboardService.getTopLongestLearnStreaks(top);
+      return res.status(http.StatusCodes.OK).json(streaks);
+    } catch (error) {
+      console.error(error);
+      return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
+  getTopLearnedCardsCount: async (req, res) => {
+    try {
+      const { top } = req.query;
+      const cards = await dashboardService.getTopLearnedCardsCount(top);
+      return res.status(http.StatusCodes.OK).json(cards);
+    } catch (error) {
+      console.error(error);
+      return res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
 };
 
 module.exports = dashboardController;

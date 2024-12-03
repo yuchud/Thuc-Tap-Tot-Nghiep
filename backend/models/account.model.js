@@ -39,6 +39,11 @@ class AccountsModel extends Sequelize.Model {
           type: DataTypes.DATE,
           allowNull: true,
         },
+        learned_card_count: {
+          type: DataTypes.INTEGER,
+          allowNull: false,
+          defaultValue: 0,
+        },
         is_banned: {
           type: DataTypes.BOOLEAN,
           allowNull: false,

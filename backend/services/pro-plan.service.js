@@ -3,6 +3,7 @@ const { addMonth } = require('../utils/date.util');
 const sequelize = require('../db-connection');
 const AccountModel = require('../models/account.model');
 const purchaseHistoryModel = require('../models/purchase-history.model');
+const notificationService = require('./notification.service');
 
 const proPlansService = {
   getAllProPlans: async (is_public = null) => {
@@ -102,7 +103,15 @@ const proPlansService = {
         },
         { transaction }
       );
+      const title = 'Mua gói Pro thành công';
+
+      const message = `Bạn đã mua thành công gói ${proPlan.name} với số tiền ${
+        proPlan.price_per_month * proPlan.month_count
+      }\nTài khoản Pro của bạn sẽ hết hạn vào: ${pro_expired_at.toLocaleDateString()}.`;
+
       await transaction.commit();
+
+      await notificationService.sendNotificationToAccounts(null, [accountId], title, message);
       return true;
     } catch (error) {
       console.log(error);

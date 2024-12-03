@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Image, StyleSheet, Text } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useNavigationContainerRef } from '@react-navigation/native';
 // import AsyncStorage from '@react-native-async-storage/async-storage';
 // import { StripeProvider } from '@stripe/stripe-react-native';
 
@@ -9,7 +9,7 @@ export default function IndexScreen() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      //   const userToken = await AsyncStorage.getItem('userToken');
+      //const userToken = await AsyncStorage.getItem('userToken');
       const userToken = 1;
       if (userToken) {
         navigation.navigate('(login)');
@@ -23,10 +23,10 @@ export default function IndexScreen() {
   }, [navigation]);
 
   return (
-      <View style={styles.container}>
-        <Image source={require('../assets/images/app_logo.png')} style={styles.logo} />
-        <Text style={styles.title}>App học Tiếng Anh</Text>
-      </View>
+    <View style={styles.container}>
+      <Image source={require('../assets/images/app_logo.png')} style={styles.logo} />
+      <Text style={styles.title}>App học Tiếng Anh</Text>
+    </View>
   );
 }
 

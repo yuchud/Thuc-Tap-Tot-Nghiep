@@ -30,6 +30,7 @@ const About = Loadable(lazy(() => import('../views/about/About')));
 const Contact = Loadable(lazy(() => import('../views/contact/Contact')));
 const Notification = Loadable(lazy(() => import('../views/notifications/Notifications')));
 const ResetPassword = Loadable(lazy(() => import('../views/authentication/ResetPassword')));
+const Tracker = Loadable(lazy(() => import('../views/tracker/Tracker')));
 const Router = [
   {
     path: '/',
@@ -49,6 +50,7 @@ const Router = [
       // { path: '/profile', element: <Profile /> },
       // { path: '/password', element: <Password /> },
       { path: '/notifications', element: <Notification /> },
+      { path: '/tracker', element: <Tracker /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

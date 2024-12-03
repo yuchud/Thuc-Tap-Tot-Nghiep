@@ -99,3 +99,57 @@ export const fetchGetAccountAvatar = async () => {
     return error;
   }
 };
+
+export const fetchGetLearnStreak = async () => {
+  const accountId = GetCurrentAccountId();
+  try {
+    const response = await fetch(`${BASE_API_URL}/accounts/${accountId}/learn-streak`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      if (response.status === http.BAD_REQUEST) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    }
+    return response.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const fetchGetWeeklyLearnTracker = async () => {
+  const accountId = GetCurrentAccountId();
+  try {
+    const response = await fetch(`${BASE_API_URL}/accounts/${accountId}/weekly-learn-tracker`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      if (response.status === http.BAD_REQUEST) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    }
+    return response.json();
+  } catch (error) {
+    return error;
+  }
+};
+
+export const fetchGetLearnedCardsCount = async () => {
+  const accountId = GetCurrentAccountId();
+  try {
+    const response = await fetch(`${BASE_API_URL}/accounts/${accountId}/learned-cards-count`, {
+      method: 'GET',
+    });
+    if (!response.ok) {
+      if (response.status === http.BAD_REQUEST) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+    }
+    return response.json();
+  } catch (error) {
+    return error;
+  }
+};

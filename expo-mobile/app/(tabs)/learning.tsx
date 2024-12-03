@@ -60,8 +60,8 @@ export default function LearningScreen() {
       setLearnedCards([...learnedCards, currentCard]);
     }
     // if (newCards.length === 0) {
-      // await handleFinishLearning();
-      // return;
+    // await handleFinishLearning();
+    // return;
     // }
     setCards(newCards);
   };

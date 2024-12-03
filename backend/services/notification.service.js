@@ -1,16 +1,19 @@
 const NotificationModel = require('../models/notification.model');
 const AccountModel = require('../models/account.model');
+const io = require('../server').io;
 
 const notificationService = {
   sendNotificationToAccounts: async (senderId, recipientIds, title, message) => {
     // Send notification to user
     try {
       for (const recipientId of recipientIds) {
-        await NotificationModel.create({
+        const notification = await NotificationModel.create({
           sender_id: senderId,
           recipient_id: recipientId,
           title,
-          message,        });
+          message,
+        });
+        io.emit('new_notification', { notification });
       }
       console.log('Gửi thông báo thành công');
     } catch (error) {
@@ -71,6 +74,5 @@ const notificationService = {
     }
   },
 };
-
 
 module.exports = notificationService;

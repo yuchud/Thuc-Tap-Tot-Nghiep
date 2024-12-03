@@ -8,7 +8,7 @@ import { LinearProgress } from '@rneui/base';
 import { API_URL } from '../../constants/API';
 export default function DecksScreen() {
   const route = useRoute();
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
   const { courseId, courseName } = route.params;
   const [decks, setDecks] = useState([]);
 
@@ -42,7 +42,7 @@ export default function DecksScreen() {
 
   const handleOpenCardsInDeck = (deckId, deckName, courseId, courseName) => {
     console.log('handleOpenCardsInDeck -> deckId', deckId);
-    navigation.navigate('cards', { deckId, deckName, courseId, courseName });
+    // navigation.navigate('cards', { deckId, deckName, courseId, courseName });
   };
 
   useEffect(() => {
@@ -70,7 +70,8 @@ export default function DecksScreen() {
         leftComponent={{
           icon: 'keyboard-backspace',
           color: '#f60143',
-          onPress: () => navigation.goBack(),
+          onPress: () => {},
+          // navigation.goBack(),
         }}
         leftContainerStyle={{}}
         // linearGradientProps={{}}

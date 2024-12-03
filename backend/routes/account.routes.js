@@ -20,6 +20,10 @@ router.put('/:id/toggle-banned', accountController.toggleAccountBannedStatus);
 
 router.delete('/:id', accountController.deleteAccount);
 
+router.get('/:id/weekly-learn-tracker', accountController.getAccountWeeklyLearnTracker);
+router.get('/:id/learn-streak', accountController.getAccountLearnStreak);
+router.get('/:id/learned-cards-count', accountController.getAccountLearnedCardsCount);
+
 router.post('/send-otp', async (req, res) => {
   const { email } = req.body;
   const otp = await sendOtpToEmail(email);

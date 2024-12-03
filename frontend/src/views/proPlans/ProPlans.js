@@ -14,6 +14,8 @@ import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { fetchGetAllProPlans, fetchPurchaseProPlan } from 'src/services/ProPlanService';
 import { formatPrice } from 'src/utilities/Money';
 import { useNavigate } from 'react-router-dom';
+import { fetchVNPAY } from 'src/services/VNPAYService';
+import { GetCurrentAccountId } from 'src/services/AuthService';
 
 const ProPlans = () => {
   const [proPlans, setProPlans] = React.useState([]);
@@ -38,18 +40,19 @@ const ProPlans = () => {
     }
   };
   const navigate = useNavigate();
-  const handleClickPurchase = (proPlanId) => async () => {
+  const handleClickPurchase = (proPlan) => async () => {
     if (!isLoggedIn) {
       navigate('/auth/login');
       return;
     }
     try {
-      const response = await fetchPurchaseProPlan(proPlanId);
-      if (response.hasOwnProperty('error')) {
-        console.log(response.error);
-        return;
-      }
-      alert('Mua thành công');
+      const formData = new FormData();
+      formData.amount = proPlan.price_per_month * proPlan.month_count;
+      formData.backCode = 'VNBANK';
+      formData.language = 'vn';
+      formData.accountId = GetCurrentAccountId();
+      formData.proPlanId = proPlan.id;
+      await fetchVNPAY(formData);
     } catch (error) {
       console.error('handleClickPurchase', error);
     }
@@ -177,13 +180,34 @@ const ProPlans = () => {
                     </Typography>
                   </Box>
                 ))}
+                <Divider
+                  sx={{
+                    my: 2,
+                    opacity: 0.2,
+                    borderColor: 'grey.500',
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'baseline',
+                    color: proPlan.is_recommend ? 'grey.50' : undefined,
+                  }}
+                >
+                  <Typography component="h3" variant="h2">
+                    Tổng {formatPrice(proPlan.price_per_month * proPlan.month_count)}đ
+                  </Typography>
+                  <Typography component="h3" variant="h6">
+                    &nbsp;
+                  </Typography>
+                </Box>
               </CardContent>
               <CardActions>
                 <Button
                   fullWidth
                   variant={proPlan.is_recommend ? 'contained' : 'outlined'}
                   component="a"
-                  onClick={handleClickPurchase(proPlan.id)}
+                  onClick={handleClickPurchase(proPlan)}
                   target="_blank"
                 >
                   Mua ngay

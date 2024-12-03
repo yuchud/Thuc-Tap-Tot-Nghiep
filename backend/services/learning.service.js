@@ -1,6 +1,10 @@
 const AccountCardDetailModel = require('../models/account-card-detail.model');
 const AccountDeckDetailModel = require('../models/account-deck-detail.model');
 const AccountCourseDetailModel = require('../models/account-course-detail.model');
+const AccountModel = require('../models/account.model');
+const LearnStreakModel = require('../models/learn-streak.model');
+const WeeklyLearnTrackerModel = require('../models/weekly-learn-tracker.model');
+
 require('dotenv').config();
 const sequelize = require('../db-connection');
 
@@ -95,7 +99,7 @@ const learningService = {
     // 7. join 5 and 6 to get cards to study with word classes name
     return cardsToStudy.map((card) => {
       const wordClass = wordClasses.find((wordClass) => wordClass.id === card.word_class_id);
-      console.log('wordClass', wordClass);
+      //console.log('wordClass', wordClass);
       return {
         ...card,
         word_class_name: wordClass ? wordClass.name : '',
@@ -110,7 +114,7 @@ const learningService = {
     }
     // process.env.TZ = 'Asia/Ho_Chi_Minh';
     const currentDateTime = DateService.getCurrentDateTime();
-    // console.log('currentDateTime', currentDateTime);
+
     const transaction = await sequelize.transaction();
     try {
       let learnedDecksList = [];
@@ -136,6 +140,17 @@ const learningService = {
               performance: studiedCard.performance,
             },
             { transaction }
+          );
+          await AccountModel.update(
+            {
+              learned_card_count: sequelize.literal('learned_card_count + 1'),
+            },
+            {
+              where: {
+                id: accountID,
+              },
+              transaction,
+            }
           );
           await CardModel.update(
             {
@@ -294,6 +309,67 @@ const learningService = {
             }
           );
         }
+      }
+
+      const dayOfWeek = DateService.getCurrentDayOfWeek();
+
+      // create or update learn_streak in learn_streaks table
+      const learnStreak = await LearnStreakModel.findOne({
+        where: {
+          account_id: accountID,
+        },
+      });
+
+      if (learnStreak === null) {
+        await LearnStreakModel.create(
+          {
+            account_id: accountID,
+            longest_learned_day_streak: 1,
+            current_learned_day_streak: 1,
+          },
+          { transaction }
+        );
+      } else {
+        const isTodayLearned = await WeeklyLearnTrackerModel.findOne({
+          where: {
+            account_id: accountID,
+            day_of_week: DateService.getCurrentDayOfWeek(),
+          },
+        });
+        if (isTodayLearned === null) {
+          await LearnStreakModel.update(
+            {
+              current_learned_day_streak: learnStreak.current_learned_day_streak + 1,
+              longest_learned_day_streak: Math.max(
+                learnStreak.longest_learned_day_streak,
+                learnStreak.current_learned_day_streak + 1
+              ),
+            },
+            {
+              where: {
+                account_id: accountID,
+              },
+              transaction,
+            }
+          );
+        }
+      }
+
+      // create weekly_learn_tracker in weekly_learn_trackers table
+      const weeklyLearnTracker = await WeeklyLearnTrackerModel.findOne({
+        where: {
+          account_id: accountID,
+          day_of_week: dayOfWeek,
+        },
+      });
+      if (weeklyLearnTracker === null) {
+        await WeeklyLearnTrackerModel.create(
+          {
+            account_id: accountID,
+            day_of_week: dayOfWeek,
+          },
+          { transaction }
+        );
       }
       await transaction.commit();
       return true;

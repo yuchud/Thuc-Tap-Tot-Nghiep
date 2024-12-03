@@ -1,5 +1,7 @@
 const sequelize = require('../db-connection');
 const accountModel = require('../models/account.model');
+const weeklyLearnTracker = require('../models/weekly-learn-tracker.model');
+const learnStreakModel = require('../models/learn-streak.model');
 const { hashPassword, comparePassword } = require('../utils/hashing.util');
 const appConfig = require('../config/app.config');
 const jwt = require('jsonwebtoken');
@@ -291,6 +293,40 @@ const accountService = {
       await accountService.updatePassword(account.id, newPassword);
 
       return { message: 'Đặt lại mật khẩu thành công' };
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
+  },
+  getAccountWeeklyLearnTracker: async (account_id) => {
+    try {
+      const weeklyLearnTrackerData = await weeklyLearnTracker.findAll({
+        where: { account_id: account_id },
+      });
+      return weeklyLearnTrackerData;
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
+  },
+  getAccountLearnStreak: async (account_id) => {
+    try {
+      const learnStreak = await learnStreakModel.findOne({
+        where: { account_id: account_id },
+      });
+      return learnStreak;
+    } catch (error) {
+      console.error(error);
+      return { error: error.message };
+    }
+  },
+  getAccountLearnedCardsCount: async (account_id) => {
+    try {
+      const account = await accountModel.findByPk(account_id);
+      if (!account) {
+        return { error: 'Tài khoản không tồn tại' };
+      }
+      return await account.learned_card_count;
     } catch (error) {
       console.error(error);
       return { error: error.message };

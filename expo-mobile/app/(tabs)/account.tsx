@@ -15,7 +15,7 @@ export default function AccountScreen() {
   const [fullName, setFullName] = useState('');
   const [avatar, setAvatar] = useState('');
   const [badgeInfo, setBadgeInfo] = useState({});
-  const navigation = useNavigation();
+  //const navigation = useNavigation();
   const fetchAccount = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
     const decodedToken = jwtDecode(userToken);
@@ -42,16 +42,16 @@ export default function AccountScreen() {
   };
 
   const handleProfileButton = () => {
-    navigation.navigate('profile');
+    //navigation.navigate('profile');
   };
 
   const handleChangePasswordButton = () => {
-    navigation.navigate('change_password');
+    //navigation.navigate('change_password');
   };
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('userToken');
-    navigation.navigate('(login)');
+    //navigation.navigate('(login)');
   };
 
   const formatDateOnly = async (date) => {

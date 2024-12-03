@@ -54,7 +54,7 @@ const ProHistories = () => {
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>STT</TableCell>
+                <TableCell>ID</TableCell>
                 <TableCell align="right">Tên gói</TableCell>
                 <TableCell align="right">Tổng thanh toán</TableCell>
                 <TableCell align="right">Thời gian mua</TableCell>
@@ -64,7 +64,7 @@ const ProHistories = () => {
               {purchaseHistories.map((purchaseHistory, index) => (
                 <TableRow key={index} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
                   <TableCell component="th" scope="row">
-                    {index + 1}
+                    {purchaseHistory.id}
                   </TableCell>
                   <TableCell align="right">{purchaseHistory.pro_plan_name}</TableCell>
                   <TableCell align="right">

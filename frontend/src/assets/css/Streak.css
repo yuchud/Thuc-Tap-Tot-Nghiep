@@ -1,0 +1,21 @@
+.streak {
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
+    color: #f39c12;
+    border: 1px solid #f39c12;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+  }
+  
+  .streak:hover {
+    background-color: #f39c12;
+    color: #fff;
+    /* cursor: pointer; */
+  }
+  
+  .streak svg {
+    margin-right: 0.5rem;
+  }

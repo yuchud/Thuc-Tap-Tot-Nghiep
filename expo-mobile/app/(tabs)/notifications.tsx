@@ -10,8 +10,10 @@ import { API_URL } from '../../constants/API';
 import { ListItem } from '@rneui/themed';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { List } from 'native-base';
-
+import { io } from 'socket.io-client';
 //import { useState } from 'react';
+
+const socket = io('http://localhost:3000');
 
 export default function NotificationsScreen() {
   const navigation = useNavigation();
@@ -53,6 +55,25 @@ export default function NotificationsScreen() {
   useEffect(() => {
     fetchNotifications();
   }, []);
+
+  // useEffect(() => {
+  //   socket.on('connect', () => {
+  //     console.log('Connected to server');
+  //     const accountId = jwtDecode(AsyncStorage.getItem('userToken')).id;
+  //     if (accountId) {
+  //       socket.emit('join', accountId);
+  //     }
+  //   });
+
+  //   socket.on('new_notification', (notification) => {
+  //     setNotifications((prevNotifications) => [notification, ...prevNotifications]);
+  //   });
+
+  //   return () => {
+  //     socket.off('new_notification');
+  //     socket.off('connect');
+  //   };
+  // }, []);
 
   return (
     <View>
@@ -178,5 +199,5 @@ const styles = {
     position: 'absolute',
     right: 10,
     top: 10,
-  }
+  },
 };

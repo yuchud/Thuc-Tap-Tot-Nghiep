@@ -69,7 +69,7 @@ const NotificationPage = () => {
           <>
             <h2>{selectedNotification.title}</h2>
             <hr />
-            <p>{selectedNotification.message}</p>
+            <p className="notification-message">{selectedNotification.message}</p>
           </>
         ) : (
           <p>Chọn thông báo để xem</p>

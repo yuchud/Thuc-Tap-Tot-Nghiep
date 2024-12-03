@@ -4,7 +4,7 @@ import { PricingCard, lightColors } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '../../constants/API';
-import {useNavigation} from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 export default function PricingScreen() {
   const [proPlans, setProPlans] = useState([]);
   const navigation = useNavigation();
@@ -58,7 +58,7 @@ export default function PricingScreen() {
 
   const handlePaymentPress = async () => {
     navigation.navigate('payment');
-  }
+  };
 
   const formatPrice = (price) => {
     if (price.endsWith('.00')) {

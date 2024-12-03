@@ -2,13 +2,14 @@ import React from 'react';
 import { Stack, Button, IconButton, Badge } from '@mui/material';
 import Profile from './Profile';
 import { IconBellRinging } from '@tabler/icons';
-
+import Streak from '../../../components/Streak';
 const LoginRightGroupHeader = () => {
   return (
     <Stack spacing={1} direction="row" alignItems="center">
       {/* <Button variant="contained" color="primary" href="/pro-plans">
         Upgrade to Pro
       </Button> */}
+      <Streak />
       <IconButton
         size="large"
         aria-label="show 11 new notifications"

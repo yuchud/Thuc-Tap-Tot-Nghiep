@@ -14,4 +14,8 @@ router.get('/top-pro-plans-in-year/:year', dashboardController.getTopProPlansInY
 router.get('/created-accounts-in-month/:year/:month', dashboardController.getCreatedAccountsInMonth);
 router.get('/created-accounts-in-year/:year', dashboardController.getCreatedAccountsInYear);
 router.get('/created-accounts-daily-in-month/:year/:month', dashboardController.getCreatedAccountsDailyInMonth);
+
+router.get('/top-current-learn-streaks', dashboardController.getTopCurrentLearnStreaks);
+router.get('/top-longest-learn-streaks', dashboardController.getTopLongestLearnStreaks);
+router.get('/top-learned-cards-count', dashboardController.getTopLearnedCardsCount);
 module.exports = router;
