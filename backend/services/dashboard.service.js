@@ -9,6 +9,8 @@ const LearnStreak = require('../models/learn-streak.model');
 const DashboardService = {
   getRevenueDailyInMonth: async (year, month) => {
     try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const revenue = await PurchaseHistoriesModel.findAll({
         attributes: [
           [sequelize.fn('DAY', sequelize.col('purchased_at')), 'day'],
@@ -16,7 +18,7 @@ const DashboardService = {
         ],
         where: {
           purchased_at: {
-            [Op.between]: [`${year}-${month}-01`, `${year}-${month}-31`],
+            [Op.between]: [startDate, endDate],
           },
         },
         group: [sequelize.fn('DAY', sequelize.col('purchased_at'))],
@@ -44,6 +46,7 @@ const DashboardService = {
         group: [sequelize.fn('MONTH', sequelize.col('purchased_at'))],
         order: [[sequelize.fn('MONTH', sequelize.col('purchased_at'))]],
       });
+      // console.log(revenue);
       return revenue;
     } catch (error) {
       console.error(error);
@@ -53,11 +56,14 @@ const DashboardService = {
 
   getRevenueInMonth: async (year, month) => {
     try {
+      console.log(year, month);
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const revenue = await PurchaseHistoriesModel.findAll({
         attributes: [[sequelize.fn('SUM', sequelize.col('purchased_amount')), 'total_revenue']],
         where: {
           purchased_at: {
-            [Op.between]: [`${year}-${month}-01`, `${year}-${month}-31`],
+            [Op.between]: [startDate, endDate],
           },
         },
       });
@@ -65,15 +71,13 @@ const DashboardService = {
       revenue[0].dataValues.total_revenue = revenue[0].dataValues.total_revenue || 0;
 
       const previousMonth = dateUtil.getPreviousMonth(year, month);
-      console.log(previousMonth);
+      const previousStartDate = new Date(previousMonth.year, previousMonth.month - 1, 1);
+      const previousEndDate = new Date(previousMonth.year, previousMonth.month, 0);
       const previousRevenue = await PurchaseHistoriesModel.findAll({
         attributes: [[sequelize.fn('SUM', sequelize.col('purchased_amount')), 'total_revenue']],
         where: {
           purchased_at: {
-            [Op.between]: [
-              `${previousMonth.year}-${previousMonth.month}-01`,
-              `${previousMonth.year}-${previousMonth.month}-31`,
-            ],
+            [Op.between]: [previousStartDate, previousEndDate],
           },
         },
       });
@@ -180,6 +184,8 @@ const DashboardService = {
 
   getTopProPlansRevenueInMonth: async (year, month) => {
     try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const proPlansPurchase = await PurchaseHistoriesModel.findAll({
         attributes: [
           'pro_plan_id',
@@ -188,7 +194,7 @@ const DashboardService = {
         ],
         where: {
           purchased_at: {
-            [Op.between]: [`${year}-${month}-01`, `${year}-${month}-31`],
+            [Op.between]: [startDate, endDate],
           },
         },
         group: ['pro_plan_id'],
@@ -238,24 +244,25 @@ const DashboardService = {
 
   getCreatedAccountsInMonth: async (year, month) => {
     try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const accounts = await AccountsModel.findAll({
         attributes: [[sequelize.fn('COUNT', sequelize.col('id')), 'total_created_accounts']],
         where: {
           created_at: {
-            [Op.between]: [`${year}-${month}-01`, `${year}-${month}-31`],
+            [Op.between]: [startDate, endDate],
           },
         },
       });
 
       const previousMonth = dateUtil.getPreviousMonth(year, month);
+      const previousStartDate = new Date(previousMonth.year, previousMonth.month - 1, 1);
+      const previousEndDate = new Date(previousMonth.year, previousMonth.month, 0);
       const previousAccounts = await AccountsModel.findAll({
         attributes: [[sequelize.fn('COUNT', sequelize.col('id')), 'total_created_accounts']],
         where: {
           created_at: {
-            [Op.between]: [
-              `${previousMonth.year}-${previousMonth.month}-01`,
-              `${previousMonth.year}-${previousMonth.month}-31`,
-            ],
+            [Op.between]: [previousStartDate, previousEndDate],
           },
         },
       });
@@ -343,6 +350,8 @@ const DashboardService = {
 
   getCreatedAccountsDailyInMonth: async (year, month) => {
     try {
+      const startDate = new Date(year, month - 1, 1);
+      const endDate = new Date(year, month, 0);
       const accounts = await AccountsModel.findAll({
         attributes: [
           [sequelize.fn('DAY', sequelize.col('created_at')), 'day'],
@@ -350,7 +359,7 @@ const DashboardService = {
         ],
         where: {
           created_at: {
-            [Op.between]: [`${year}-${month}-01`, `${year}-${month}-31`],
+            [Op.between]: [startDate, endDate],
           },
         },
         group: [sequelize.fn('DAY', sequelize.col('created_at'))],
@@ -371,6 +380,7 @@ const DashboardService = {
       const streaks = await LearnStreak.findAll({
         attributes: ['account_id', [sequelize.literal('current_learned_day_streak'), 'value']],
         order: [['current_learned_day_streak', 'DESC']],
+        where: { current_learned_day_streak: { [Op.gt]: 0 } },
         limit: top,
       });
 

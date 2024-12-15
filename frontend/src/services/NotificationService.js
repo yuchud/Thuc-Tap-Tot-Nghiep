@@ -29,3 +29,16 @@ export const markNotificationAsRead = async (notificationId) => {
     console.error('Error marking notification as read:', error);
   }
 };
+
+export const deleteNotification = async (notificationId) => {
+  try {
+    await fetch(`${BASE_API_URL}/notifications/${notificationId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+  }
+};

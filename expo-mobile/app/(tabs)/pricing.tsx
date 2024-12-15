@@ -1,13 +1,75 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Alert } from 'react-native';
 import { PricingCard, lightColors } from '@rneui/themed';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 import { API_URL } from '../../constants/API';
 import { useNavigation } from '@react-navigation/native';
+
+import { useStripe } from '@stripe/stripe-react-native';
+
 export default function PricingScreen() {
   const [proPlans, setProPlans] = useState([]);
   const navigation = useNavigation();
+
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const fetchPaymentSheetParams = async (proPlan) => {
+    const response = await fetch(`${API_URL}/payment/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount: proPlan.price_per_month * proPlan.month_count }),
+    });
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    console.log('response:', response);
+    console.log('response.json():', response.json());
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async (proPlan) => {
+    const { paymentIntent, ephemeralKey, customer } = await fetchPaymentSheetParams(proPlan);
+
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: 'Example, Inc.',
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: true,
+      defaultBillingDetails: {
+        name: 'Jane Doe',
+      },
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async (proPlan) => {
+    await initializePaymentSheet(proPlan);
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert('Thông báo', `Thanh toán thất bại!`);
+    } else {
+      try {
+        await handlePurchaseProPlan(proPlan.id);
+        Alert.alert('Success', `Thanh toán thành công!`);
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
+      }
+    }
+  };
+
   const fetchProPlans = async () => {
     try {
       const response = await fetch(`${API_URL}/pro-plans/public`, {
@@ -42,14 +104,10 @@ export default function PricingScreen() {
         },
         body: JSON.stringify({ account_id: id }),
       });
-      console.log(response);
       if (!response.ok) {
         alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
         return;
       }
-      const data = await response.json();
-      console.log(data);
-      alert('Mua thành công');
     } catch (error) {
       console.error('Error:', error);
       alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
@@ -61,9 +119,8 @@ export default function PricingScreen() {
   };
 
   const formatPrice = (price) => {
-    if (price.endsWith('.00')) {
-      return price.slice(0, -3);
-    }
+    price = price.toString();
+    return price;
   };
 
   useEffect(() => {
@@ -77,9 +134,9 @@ export default function PricingScreen() {
             key={proPlan.id}
             color={proPlan.is_recommend ? lightColors.secondary : lightColors.primary}
             title={proPlan.name}
-            price={`${formatPrice(proPlan.price_per_month)}đ / tháng`}
+            price={`${formatPrice(proPlan.price_per_month * proPlan.month_count)}đ`}
             info={proPlan.description.split('.').map((line) => line.trim())}
-            button={{ title: 'Mua ngay', icon: 'attach-money', onPress: () => handlePaymentPress() }}
+            button={{ title: 'Mua ngay', icon: 'attach-money', onPress: () => openPaymentSheet(proPlan) }}
           />
         ))}
       </ScrollView>

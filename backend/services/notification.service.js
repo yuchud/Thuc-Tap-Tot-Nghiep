@@ -13,7 +13,7 @@ const notificationService = {
           title,
           message,
         });
-        io.emit('new_notification', { notification });
+        // io.emit('new_notification', { notification });
       }
       console.log('Gửi thông báo thành công');
     } catch (error) {

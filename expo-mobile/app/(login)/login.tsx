@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { API_URL } from '../../constants/API';
+import { router } from 'expo-router';
 
 export default function LoginScreen() {
   const [usernameOrEmail, setUsernameOrEmail] = useState('');
@@ -84,7 +85,7 @@ export default function LoginScreen() {
       {error ? <Text style={{ color: 'red' }}>{error}</Text> : null}
       <View style={styles.row}>
         <Button title="Đăng nhập" onPress={handleLogin} />
-        <Text style={styles.forgotPasswordText} onPress={() => navigation.navigate('(register)')}>
+        <Text style={styles.forgotPasswordText} onPress={() => navigation.navigate('(reset_password)')}>
           Quên mật khẩu?
         </Text>
       </View>

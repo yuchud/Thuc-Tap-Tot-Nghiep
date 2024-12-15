@@ -10,7 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 
 export default function CardsScreen() {
   const route = useRoute();
-  //const navigation = useNavigation();
+  const navigation = useNavigation();
   const { deckId, deckName, courseId, courseName } = route.params;
   const [cards, setCards] = useState([]);
 
@@ -37,7 +37,7 @@ export default function CardsScreen() {
   };
 
   const handleLearning = async (deckId, deckName) => {
-    // navigation.navigate('learning', { deckId, deckName, courseId, courseName });
+    navigation.navigate('learning', { deckId, deckName, courseId, courseName });
   };
 
   useEffect(() => {
@@ -62,8 +62,9 @@ export default function CardsScreen() {
         leftComponent={{
           icon: 'keyboard-backspace',
           color: '#f60143',
-          onPress: () =>{},
-            // navigation.navigate('decks', { courseId, courseName }),
+          onPress: () => {
+            navigation.navigate('decks', { courseId, courseName });
+          },
         }}
         rightComponent={{
           text: 'Học ngay',

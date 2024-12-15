@@ -9,7 +9,7 @@ import { Button, Icon } from '@rneui/base';
 import { API_URL } from '../../constants/API';
 
 export default function ChangePasswordScreen() {
-  //const navigation = useNavigation();
+  const navigation = useNavigation();
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -46,7 +46,7 @@ export default function ChangePasswordScreen() {
       }
 
       alert('Đổi mật khẩu thành công');
-      //navigation.navigate('account');
+      navigation.navigate('account');
     } catch (error) {
       console.error('Error:', error);
       alert('Có lỗi xảy ra. Vui lòng thử lại sau.');
@@ -68,8 +68,9 @@ export default function ChangePasswordScreen() {
         leftComponent={{
           icon: 'keyboard-backspace',
           color: '#f60143',
-          onPress: () => {},
-          // navigation.navigate('account'),
+          onPress: () => {
+            navigation.navigate('account');
+          },
         }}
         leftContainerStyle={{}}
         // linearGradientProps={{}}

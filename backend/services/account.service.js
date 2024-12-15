@@ -12,6 +12,22 @@ const { otpStore } = require('./otp.service');
 const accountService = {
   getAllAccounts: async (page = 1, limit = 12, searchQuery) => {
     try {
+      if (limit == 0) {
+        const accounts = await accountModel.findAll({
+          where: {
+            account_role_id: {
+              [sequelize.Sequelize.Op.not]: appConfig.USER_ROLE.ADMIN,
+            },
+          },
+          attributes: { exclude: ['password'] },
+        });
+        return {
+          total: accounts.length,
+          accounts: accounts,
+          totalPages: 1,
+          currentPage: 1,
+        };
+      }
       page = parseInt(page);
       limit = parseInt(limit);
       if (page < 1) {

@@ -40,3 +40,19 @@ export const fetchFinishLearning = async (learnedCards) => {
     return error;
   }
 };
+
+export const fetchGetCardsToTest = async () => {
+  try {
+    const accountID = GetCurrentAccountId();
+    const response = await fetch(`${BASE_API_URL}/learning/test?account_id=${accountID}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    return error;
+  }
+};

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Header, Icon, Avatar } from '@rneui/base';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { background } from 'native-base/lib/typescript/theme/styled-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';

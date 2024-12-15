@@ -11,13 +11,15 @@ import { io } from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
 // const socket = io('http://localhost:3000');
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  // const navigation = useNavigation();
   const colorScheme = useColorScheme();
+  const publishableKey =
+    'pk_test_51QJ91mGM0vTUWuMmjrkAH7FXcX2CdIB7qyfZN9zPJsMqzGWbKIgU6GLoxMjSa9dheQNs27J2CNsgJhkwE9besXMg00cSQ34N1N';
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -35,40 +37,17 @@ export default function RootLayout() {
     return null;
   }
 
-  // useEffect(() => {
-  //   socket.on('connect', () => {
-  //     console.log('connected');
-  //     const userToken = localStorage.getItem('userToken');
-  //     const decodedToken = jwtDecode(userToken);
-  //     const { id } = decodedToken;
-  //     if (userToken) {
-  //       socket.emit('join', { id });
-  //     }
-
-  //     socket.on('disconnect', () => {
-  //       console.log('disconnected');
-  //     });
-
-  //     socket.on('new_notification', (notification) => {
-  //       setNotifications((notifications) => [notification, ...notifications]);
-  //     });
-
-  //     return () => {
-  //       socket.off('connect');
-  //       socket.off('disconnect');
-  //       socket.off('new_notification');
-  //     };
-  //   });
-  // }, []);
-
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(login)" options={{ headerShown: false }} />
-        <Stack.Screen name="(register)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
+      <StripeProvider publishableKey={publishableKey}>
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(login)" options={{ headerShown: false }} />
+          <Stack.Screen name="(register)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(reset_password)" options={{ headerShown: false }} />
+        </Stack>
+      </StripeProvider>
     </ThemeProvider>
   );
 }

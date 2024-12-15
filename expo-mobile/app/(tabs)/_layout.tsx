@@ -23,6 +23,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="tracker"
+        options={{
+          title: 'Tiến độ',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'ribbon' : 'ribbon-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="pricing"
         options={{
           title: 'Gói Pro',
@@ -61,13 +70,7 @@ export default function TabLayout() {
           tabBarButton: () => null,
         }}
       />
-      <Tabs.Screen
-        name="template"
-        options={{
-          title: '',
-          tabBarButton: () => null,
-        }}
-      />
+
       <Tabs.Screen
         name="change_password"
         options={{

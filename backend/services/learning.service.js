@@ -108,6 +108,21 @@ const learningService = {
       };
     });
   },
+  getCardsToTest: async (accountID, limit = 10) => {
+    const account = await AccountModel.findByPk(accountID);
+
+    if (account === null) {
+      return null;
+    }
+    const cardsTest = await AccountCardDetailModel.findAll({
+      where: {
+        account_id: accountID,
+      },
+      order: [['performance', 'ASC']],
+      limit: limit,
+    });
+    return cardsTest;
+  },
   finishLearning: async (accountID, studiedCards) => {
     if (studiedCards.length === 0) {
       return false;

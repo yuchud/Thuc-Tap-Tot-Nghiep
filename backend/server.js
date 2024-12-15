@@ -4,6 +4,8 @@ const app = require('./app');
 const appConfig = require('./config/app.config');
 const jestConfig = require('./config/jest.config');
 const { checkProPlanExpiration } = require('./jobs/pro-plan-expiration.job');
+const { sendWeeklySummary } = require('./jobs/weekly-summary.job');
+const { checkAndBreakStreak } = require('./jobs/break-streak.job');
 
 let port;
 if (process.env.NODE_ENV === 'test') {
@@ -36,6 +38,8 @@ server.listen(port, (err) => {
     });
 
     checkProPlanExpiration();
+    checkAndBreakStreak();
+    sendWeeklySummary();
   }
 });
 

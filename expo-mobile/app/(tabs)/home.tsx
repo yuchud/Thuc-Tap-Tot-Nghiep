@@ -100,7 +100,7 @@ export default function HomeScreen() {
                   textStyle={styles.badgeText}
                 />
               )}
-              <Card.Title>{course.name || 'Course Name'}</Card.Title>
+              <Text style={styles.title} >{course.name || 'Course Name'}</Text>
               <Card.Divider />
               <Card.Image
                 style={{ padding: 0 }}
@@ -133,6 +133,12 @@ const styles = StyleSheet.create({
   scrollView: {
     padding: 20,
     backgroundColor: '#eff',
+  },
+  title: {
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   container: {
     flex: 1,

@@ -31,6 +31,7 @@ const Contact = Loadable(lazy(() => import('../views/contact/Contact')));
 const Notification = Loadable(lazy(() => import('../views/notifications/Notifications')));
 const ResetPassword = Loadable(lazy(() => import('../views/authentication/ResetPassword')));
 const Tracker = Loadable(lazy(() => import('../views/tracker/Tracker')));
+const Test = Loadable(lazy(() => import('../views/test/Test')));
 const Router = [
   {
     path: '/',
@@ -51,6 +52,7 @@ const Router = [
       // { path: '/password', element: <Password /> },
       { path: '/notifications', element: <Notification /> },
       { path: '/tracker', element: <Tracker /> },
+      { path: '/test', element: <Test /> },
       { path: '*', element: <Navigate to="/auth/404" /> },
     ],
   },

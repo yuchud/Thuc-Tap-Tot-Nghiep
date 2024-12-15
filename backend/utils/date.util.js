@@ -29,6 +29,13 @@ const dateUtil = {
     const date = new Date();
     return date.getDay() == 0 ? 7 : date.getDay();
   },
+  formatDate: (date) => {
+    return new Intl.DateTimeFormat('en-GB', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }).format(date);
+  },
 };
 
 module.exports = dateUtil;

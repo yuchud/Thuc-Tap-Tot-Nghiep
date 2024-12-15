@@ -58,6 +58,34 @@ const notificationController = {
       res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   },
+
+  markNotificationAsRead: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Missing required fields' });
+      }
+      await notificationService.markNotificationAsRead(id);
+      return res.status(http.StatusCodes.OK).json({ message: 'Notification marked as read' });
+    } catch (error) {
+      console.log(error);
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
+
+  deleteNotification: async (req, res) => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        return res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Missing required fields' });
+      }
+      await notificationService.deleteNotification(id);
+      return res.status(http.StatusCodes.OK).json({ message: 'Notification deleted' });
+    } catch (error) {
+      console.log(error);
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
 };
 
 module.exports = notificationController;

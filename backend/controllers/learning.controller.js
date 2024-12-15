@@ -39,6 +39,24 @@ const learningController = {
       res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
     }
   },
+  getCardsToTest: async (req, res) => {
+    try {
+      const { account_id } = req.query;
+      if (!account_id) {
+        return res.status(http.StatusCodes.BAD_REQUEST).json({ message: 'Missing required fields' });
+      }
+      const account = accountService.getAccountById(account_id);
+      if (!account) {
+        return res.status(http.StatusCodes.NOT_FOUND).json({ message: 'Account not found' });
+      }
+      const cardsToTest = await learningService.getCardsToTest(account_id);
+
+      return res.status(http.StatusCodes.OK).json(cardsToTest);
+    } catch (err) {
+      console.log(err);
+      res.status(http.StatusCodes.INTERNAL_SERVER_ERROR).json({ message: 'Internal server error' });
+    }
+  },
   finishLearning: async (req, res) => {
     try {
       const { account_id, learned_cards } = req.body;

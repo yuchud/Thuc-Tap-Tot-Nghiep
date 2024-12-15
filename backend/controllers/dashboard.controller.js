@@ -27,6 +27,7 @@ const dashboardController = {
     try {
       const year = req.params.year;
       const month = req.params.month;
+      // console.log(year, month);
       const revenue = await dashboardService.getRevenueInMonth(year, month);
       return res.status(http.StatusCodes.OK).json(revenue);
     } catch (error) {

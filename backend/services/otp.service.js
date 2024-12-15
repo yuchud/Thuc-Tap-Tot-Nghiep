@@ -1,10 +1,14 @@
 const { sendEmail } = require('../utils/email.util');
 const { generateOTP } = require('../utils/otp.util');
-
+const AccountModel = require('../models/account.model');
 let otpStore = {}; // Temporary in-memory store for OTPs
 
 const sendOtpToEmail = async (email) => {
   try {
+    const account = await AccountModel.findOne({ where: { email } });
+    if (!account) {
+      return { success: false, message: 'Account not found' };
+    }
     console.log('Sending OTP to email:', email);
     const otp = generateOTP();
     otpStore[email] = otp; // Store OTP in memory

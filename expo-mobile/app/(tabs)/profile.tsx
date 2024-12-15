@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import { Header, Icon, Avatar } from '@rneui/base';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
-import { View, Text, TextInput } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 import { background } from 'native-base/lib/typescript/theme/styled-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { jwtDecode } from 'jwt-decode';
-import * as ImagePicker from 'react-native-image-picker';
+// import * as ImagePicker from 'react-native-image-picker';
 import { API_URL } from '../../constants/API';
+import * as ImagePicker from 'expo-image-picker';
+import * as FileSystem from 'expo-file-system';
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const [avatar, setAvatar] = React.useState('');
+  const [newAvatar, setNewAvatar] = React.useState<any>(null);
   const [profile, setProfile] = React.useState({});
   const [firstName, setFirstName] = React.useState('');
   const [lastName, setLastName] = React.useState('');
@@ -43,6 +46,13 @@ export default function ProfileScreen() {
     }
   };
 
+  const prepareFile = async (uri) => {
+    if (uri.startsWith('file://')) {
+      return await FileSystem.getContentUriAsync(uri);
+    }
+    return uri;
+  };
+
   const handleUpdateProfile = async () => {
     setError('');
     if (!username) {
@@ -59,24 +69,58 @@ export default function ProfileScreen() {
       const userToken = await AsyncStorage.getItem('userToken');
       const decodedToken = jwtDecode(userToken);
       const { id } = decodedToken;
+
+      const fileAvatar = {
+        uri: await prepareFile(newAvatar.uri),
+        type: newAvatar.type || 'image/jpeg',
+        name: newAvatar.name || 'avatar.jpg',
+      };
+
+      const formData = new FormData();
+      formData.append('first_name', firstName);
+      formData.append('last_name', lastName);
+      formData.append('username', username);
+      formData.append('email', email);
+      if (fileAvatar) {
+        formData.append('file', {
+          uri: fileAvatar.uri,
+          type: fileAvatar.type,
+          name: fileAvatar.name,
+        });
+      }
+      console.log('fileAvatar:', fileAvatar);
       const response = await fetch(`${API_URL}/accounts/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
+          // 'Content-Type': 'multipart/form-data',
         },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          username: username,
-          email: email,
-        }),
+
+        body: formData,
       });
+      // console.log('response:', response);
+
+      // const response = await fetch(`${API_URL}/accounts/${id}`, {
+      //   method: 'PUT',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     first_name: firstName,
+      //     last_name: lastName,
+      //     username: username,
+      //     email: email,
+      //   }),
+      // });
+
       if (!response.ok) {
         const errorText = await response.text();
         const errorJson = JSON.parse(errorText);
         alert(errorJson.message);
         return;
       }
+
       const data = await response.json();
       await handleGetProfile();
       alert('Cập nhật hồ sơ thành công');
@@ -86,19 +130,28 @@ export default function ProfileScreen() {
     }
   };
 
-  const handleSelectAvatar = async () => {
-    const result = await launchImageLibrary({
-      mediaType: 'photo',
-      includeBase64: true,
+  const pickImage = async () => {
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (status !== 'granted') {
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.8,
     });
 
-    if (result.didCancel) {
-      console.log('User cancelled image picker');
-    } else if (result.error) {
-      console.log('ImagePicker Error: ', result.error);
-    } else {
-      const selectedImage = result.assets[0];
-      setAvatar(`data:${selectedImage.type};base64,${selectedImage.base64}`);
+    console.log(result);
+
+    if (!result.canceled) {
+      const pickedAsset = result.assets[0]; // Get the first selected asset
+      setNewAvatar({
+        uri: pickedAsset.uri,
+        type: pickedAsset.type || 'image/jpeg', // Default to 'image/jpeg' if type is undefined
+        name: pickedAsset.fileName || 'avatar.jpg', // Default to 'avatar.jpg' if fileName is undefined
+      });
     }
   };
 
@@ -143,26 +196,17 @@ export default function ProfileScreen() {
         statusBarProps={{}}
       />
       <View style={styles.profileBox}>
-        <View style={styles.avatar}>
-          <Avatar
-            activeOpacity={0.2}
-            avatarStyle={{}}
-            containerStyle={{ backgroundColor: '#BDBDBD' }}
-            icon={{}}
-            iconStyle={{}}
-            imageProps={{}}
-            onLongPress={() => alert('onLongPress')}
-            onPress={handleSelectAvatar}
-            overlayContainerStyle={{}}
-            placeholderStyle={{}}
-            rounded
-            size="large"
-            source={avatar ? { uri: avatar } : require('../../assets/images/app_logo.png')}
-            title="P"
-            titleStyle={{}}
-          >
-            <Avatar.Accessory size={23} />
-          </Avatar>
+        <View>
+          <TouchableOpacity onPress={pickImage}>
+            <Image
+              source={{
+                uri: newAvatar?.uri || avatar,
+              }}
+              style={styles.avatar}
+            />
+            {/* <Avatar.Accessory size={23} /> */}
+            <Text style={styles.changeAvatarText}>Change Avatar</Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Họ và tên đệm</Text>
@@ -182,8 +226,11 @@ export default function ProfileScreen() {
 
 const styles = {
   avatar: {
-    alignItems: 'center',
-    marginTop: 20,
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    alignSelf: 'center',
+    marginBottom: 8,
   },
   profileBox: {
     height: '100%',
@@ -207,5 +254,11 @@ const styles = {
     borderWidth: 1,
     padding: 10,
     backgroundColor: '#fff',
+  },
+  changeAvatarText: {
+    textAlign: 'center',
+    color: 'blue',
+    fontSize: 14,
+    marginBottom: 16,
   },
 };

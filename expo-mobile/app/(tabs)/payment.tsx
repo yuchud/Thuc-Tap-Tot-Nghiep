@@ -1,45 +1,72 @@
-import React from 'react';
-import { CardField, useStripe, CardForm } from '@stripe/stripe-react-native';
-import { Button, View, StyleSheet, Text } from 'react-native';
-import { StripeProvider } from '@stripe/stripe-react-native';
+import React, { useState, useEffect } from 'react';
+import { Button, View, StyleSheet, Text, Alert } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { jwtDecode } from 'jwt-decode';
+import { API_URL } from '../../constants/API';
+
+import { useStripe } from '@stripe/stripe-react-native';
+
 export default function PaymentScreen() {
-  const { confirmPayment } = useStripe();
-  const handlePayPress = async () => {};
+  const { initPaymentSheet, presentPaymentSheet } = useStripe();
+  const [loading, setLoading] = useState(false);
+
+  const fetchPaymentSheetParams = async () => {
+    const response = await fetch(`${API_URL}/payment/payment-sheet`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
+    console.log('response:', response);
+    console.log('response.json():', response.json());
+    return {
+      paymentIntent,
+      ephemeralKey,
+      customer,
+    };
+  };
+
+  const initializePaymentSheet = async () => {
+    const { paymentIntent, ephemeralKey, customer } = await fetchPaymentSheetParams();
+
+    const { error } = await initPaymentSheet({
+      merchantDisplayName: 'Example, Inc.',
+      customerId: customer,
+      customerEphemeralKeySecret: ephemeralKey,
+      paymentIntentClientSecret: paymentIntent,
+      // Set `allowsDelayedPaymentMethods` to true if your business can handle payment
+      //methods that complete payment after a delay, like SEPA Debit and Sofort.
+      allowsDelayedPaymentMethods: true,
+      defaultBillingDetails: {
+        name: 'Jane Doe',
+      },
+    });
+    if (!error) {
+      setLoading(true);
+    }
+  };
+
+  const openPaymentSheet = async () => {
+    await initializePaymentSheet();
+    const { error } = await presentPaymentSheet();
+
+    if (error) {
+      Alert.alert('Thông báo', `Thanh toán thất bại`);
+    } else {
+      Alert.alert('Success', 'Your order is confirmed!');
+    }
+  };
+
+  useEffect(() => {
+    initializePaymentSheet();
+  }, []);
 
   return (
-    <StripeProvider publishableKey="pk_test_51QJ91mGM0vTUWuMmjrkAH7FXcX2CdIB7qyfZN9zPJsMqzGWbKIgU6GLoxMjSa9dheQNs27J2CNsgJhkwE9besXMg00cSQ34N1N">
-      <View style={styles.container}>
-        <CardForm
-          postalCodeEnabled={false}
-          placeholder={{
-            number: '4242 4242 4242 4242',
-            expiration: 'MM/YY',
-            cvc: 'CVC',
-          }}
-          cardStyle={{
-            backgroundColor: '#ffffff', // Set the background color here
-            textColor: '#000000',
-            placeholderColor: '#888888',
-            borderWidth: 1,
-            borderColor: '#000000',
-            borderRadius: 8,
-
-          }}
-          style={{
-            width: '100%',
-            height: 200,
-            marginVertical: 30,
-          }}
-          onCardChange={(cardDetails) => {
-            console.log('cardDetails', cardDetails);
-          }}
-          onFocus={(focusedField) => {
-            console.log('focusField', focusedField);
-          }}
-        />
-        <Button onPress={handlePayPress} title="Pay" />
-      </View>
-    </StripeProvider>
+    <View style={styles.container}>
+      <Button title="Checkout" onPress={openPaymentSheet} />
+    </View>
   );
 }
 
@@ -48,7 +75,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#eff',
+    backgroundColor: '#fff',
     height: '100%',
   },
 });

@@ -1,11 +1,15 @@
 .notification-page {
   display: flex;
+  height: 100vh; /* Ensure the page takes the full height of the viewport */
+
 }
 
 .sidebar {
-  width: 300px;
+  width: 400px;
   border-right: 1px solid #ccc;
   padding: 20px;
+  overflow-y: auto; /* Enable scrolling in the sidebar */
+  height: 100%; /* Ensure the sidebar takes the full height of the container */
 }
 
 .sidebar h2 {
@@ -16,6 +20,9 @@
   padding: 10px;
   cursor: pointer;
   border-bottom: 1px solid #ccc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .notification-item.read {
@@ -25,6 +32,10 @@
 .notification-item.unread {
   background-color: #fff;
   font-weight: bold;
+}
+
+.notification-item.current {
+  background-color: #e0f7fa; /* Highlight color for the current notification */
 }
 
 .notification-title {
@@ -39,6 +50,7 @@
   background-color: red;
   border-radius: 50%;
   margin-left: 10px;
+  
 }
 
 .notification-time {
@@ -57,4 +69,28 @@
 
 .main-screen h2 {
   margin-bottom: 20px;
+  overflow: hidden; /* Prevent scrolling in the main screen */
+
+}
+
+button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+button:hover {
+  background-color: darkred;
+}
+
+.selected-notifications-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ccc;
 }

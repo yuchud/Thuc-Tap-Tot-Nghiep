@@ -14,6 +14,7 @@ const dashboardRoutes = require('./dashboard.routes');
 const notificationRoutes = require('./notification.routes');
 const wordnikRoutes = require('./wordnik.routes');
 const vnpayRoutes = require('./vnpay.routes');
+const paymentRoutes = require('./payment.routes');
 
 router.use('/accounts', accountRoutes);
 router.use('/decks', deckRoutes);
@@ -28,5 +29,6 @@ router.use('/dashboard', dashboardRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/wordnik', wordnikRoutes);
 router.use('/vnpay', vnpayRoutes);
+router.use('/payment', paymentRoutes);
 
 module.exports = router;

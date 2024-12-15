@@ -58,6 +58,9 @@ const Header = (props) => {
           <HeaderButton color="primary" href="/pro-plans" sx={{ fontWeight: 800 }}>
             Gói Pro
           </HeaderButton>
+          <HeaderButton color="primary" href="/test" sx={{ fontWeight: 800 }}>
+            Kiểm tra
+          </HeaderButton>
         </Stack>
         <Box flexGrow={1} />
         {!isLogin && <RightGroupHeader />}
